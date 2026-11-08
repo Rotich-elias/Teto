@@ -1,6 +1,7 @@
 @php
     $links = [
         ['label' => 'Services', 'route' => 'services.index', 'active' => 'services.*'],
+        ['label' => 'Products', 'route' => 'products', 'active' => 'products'],
         ['label' => 'Portfolio', 'route' => 'portfolio', 'active' => 'portfolio'],
         ['label' => 'About', 'route' => 'about', 'active' => 'about'],
         ['label' => 'Contact', 'route' => 'contact', 'active' => 'contact'],

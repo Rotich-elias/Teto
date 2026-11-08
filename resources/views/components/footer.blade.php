@@ -46,6 +46,7 @@
             <nav aria-label="Company">
                 <h2 class="text-sm font-bold text-ink">Company</h2>
                 <ul class="mt-4 space-y-2.5">
+                    <li><a href="{{ route('products') }}" class="text-sm text-ink-soft transition hover:text-primary-700 dark:hover:text-primary-300">Products</a></li>
                     <li><a href="{{ route('about') }}" class="text-sm text-ink-soft transition hover:text-primary-700 dark:hover:text-primary-300">About</a></li>
                     <li><a href="{{ route('portfolio') }}" class="text-sm text-ink-soft transition hover:text-primary-700 dark:hover:text-primary-300">Portfolio</a></li>
                     <li><a href="{{ route('contact') }}" class="text-sm text-ink-soft transition hover:text-primary-700 dark:hover:text-primary-300">Contact</a></li>

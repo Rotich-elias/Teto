@@ -11,6 +11,7 @@ class SitemapController extends Controller
         $urls = [
             ['url' => route('home'), 'priority' => '1.0', 'changefreq' => 'monthly'],
             ['url' => route('services.index'), 'priority' => '0.9', 'changefreq' => 'monthly'],
+            ['url' => route('products'), 'priority' => '0.8', 'changefreq' => 'monthly'],
             ['url' => route('portfolio'), 'priority' => '0.8', 'changefreq' => 'monthly'],
             ['url' => route('about'), 'priority' => '0.7', 'changefreq' => 'yearly'],
             ['url' => route('contact'), 'priority' => '0.9', 'changefreq' => 'yearly'],

@@ -9,6 +9,7 @@ Route::get('/', [PageController::class, 'home'])->name('home');
 Route::get('/services', [PageController::class, 'services'])->name('services.index');
 Route::get('/services/{slug}', [PageController::class, 'service'])->name('services.show');
 Route::get('/portfolio', [PageController::class, 'portfolio'])->name('portfolio');
+Route::get('/products', [PageController::class, 'products'])->name('products');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])

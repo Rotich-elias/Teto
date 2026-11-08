@@ -281,28 +281,29 @@ Every item below must be supplied or approved by the site owner. Search the code
 
 - [ ] Approve or replace the logo and brand assets in `public/images/` (`logo.svg`, `logo.png`, `favicon.svg`, `favicon-32.png`, `apple-touch-icon.png`, `og-default.png`).
 - [ ] Approve the tagline and all service copy.
-- [ ] Supply the founding year (`TETO_FOUNDED`).
+- [x] Founder (`TETO_FOUNDER`): Rotich Elias.
+- [x] Supply the founding year (`TETO_FOUNDED`): 2019.
 - [ ] Supply the real mission statement used on the about page.
 - [ ] Supply three portfolio projects: title, sector, one-line summary, problem, solution, **verified** result, technologies, and an approved image.
 - [ ] Supply team names, roles, photos, and short bios (or confirm that the team section should be removed).
 
 ### Contact and company details
 
-- [ ] Company email address (`TETO_EMAIL`).
+- [x] Company email address (`TETO_EMAIL`): tetoteknologies@gmail.com.
 - [ ] Phone number (`TETO_PHONE`).
 - [ ] WhatsApp number in international format without `+` (`TETO_WHATSAPP`).
 - [ ] Physical address (`TETO_ADDRESS`).
 - [ ] Business hours (`TETO_HOURS`).
 - [ ] Google Maps embed URL (`TETO_MAP_EMBED_URL`).
 - [ ] Social links: LinkedIn, GitHub, X, Facebook, Instagram.
-- [ ] Registered business name (`TETO_LEGAL_NAME`).
-- [ ] Business registration number (`TETO_REG_NUMBER`).
+- [x] Registered business name (`TETO_LEGAL_NAME`): Teto Technologies.
+- [x] Business registration number (`TETO_REG_NUMBER`): Tech20261.
 - [ ] Data protection contact email for privacy requests.
 
 ### Email and infrastructure
 
 - [ ] SMTP host, port, scheme, username, and password.
-- [ ] `MAIL_FROM_ADDRESS` and `MAIL_FROM_NAME`.
+- [x] `MAIL_FROM_ADDRESS` and `MAIL_FROM_NAME` (sender: tetoteknologies@gmail.com / app name).
 - [ ] `MAIL_TO` inbox for contact-form notifications.
 - [ ] Hosting/VPS provider and region.
 - [ ] Domain registrar and DNS access.

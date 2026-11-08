@@ -75,6 +75,16 @@
                         </dd>
                     </div>
                     <div>
+                        <dt class="font-semibold text-ink">Founder</dt>
+                        <dd class="mt-1 text-ink-soft">
+                            @if ($company['founder'])
+                                {{ $company['founder'] }}
+                            @else
+                                <x-todo label="founder name" />
+                            @endif
+                        </dd>
+                    </div>
+                    <div>
                         <dt class="font-semibold text-ink">Founded</dt>
                         <dd class="mt-1 text-ink-soft">
                             @if ($company['founded'])

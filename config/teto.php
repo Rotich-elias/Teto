@@ -18,8 +18,8 @@ return [
 
     'company' => [
         'name' => 'Teto Technologies',
-        'legal_name' => env('TETO_LEGAL_NAME'),
-        'registration_number' => env('TETO_REG_NUMBER'),
+        'legal_name' => env('TETO_LEGAL_NAME', 'Teto Technologies'),
+        'registration_number' => env('TETO_REG_NUMBER', 'Tech20261'),
         'tagline' => 'Software and networks that work.',
         'secondary_tagline' => 'Built in Kenya. Built to scale.',
         'description' => 'Teto Technologies is a Kenyan technology company delivering custom software, mobile apps, M-Pesa integrations and network infrastructure.',
@@ -29,7 +29,8 @@ return [
         'whatsapp_message' => env('TETO_WHATSAPP_MESSAGE', 'Hello Teto Technologies, I would like to discuss a project.'),
         'address' => env('TETO_ADDRESS'),
         'hours' => env('TETO_HOURS'),
-        'founded' => env('TETO_FOUNDED'),
+        'founded' => env('TETO_FOUNDED', '2019'),
+        'founder' => env('TETO_FOUNDER', 'Rotich Elias'),
         'map_embed_url' => env('TETO_MAP_EMBED_URL'),
     ],
 
@@ -259,6 +260,25 @@ return [
             'result' => null,
             'tech' => [],
             'image' => 'images/work-3.svg',
+        ],
+    ],
+
+    /*
+    | Products — apps for download and website links. Add entries with
+    | verified names, descriptions, and URLs. Leave fields null/empty to
+    | show a TODO(owner) placeholder.
+    */
+    'products' => [
+        [
+            'name' => null,
+            'kind' => 'app', // app | website
+            'summary' => null,
+            'description' => null,
+            'image' => 'images/work-1.svg',
+            'download_url' => null, // APK / store / installer
+            'website_url' => null,
+            'platforms' => [], // e.g. ['Android', 'iOS', 'Web']
+            'status' => null, // e.g. 'Available', 'Coming soon'
         ],
     ],
 

@@ -45,6 +45,13 @@ class PageController extends Controller
         ]);
     }
 
+    public function products(): View
+    {
+        return view('pages.products', [
+            'products' => config('teto.products', []),
+        ]);
+    }
+
     public function about(): View
     {
         return view('pages.about', [
