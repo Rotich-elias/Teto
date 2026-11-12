@@ -20,8 +20,13 @@
     "resend": "^6.38.0"
   },
   "devDependencies": {
-    "@types/node": "26.6.6",
-    "@types/react": "19.3.0",
-    "typescript": "7.0.2"
+    "@types/node": "^26.6.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "autoprefixer": "^10.6.2",
+    "postcss": "^8.5.32",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^7.0.2",
+    "vitest": "^4.1.12"
   }
 }
