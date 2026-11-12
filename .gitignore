@@ -1,23 +1,26 @@
-/.phpunit.cache
+# dependencies
 /node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
-/storage/pail
-/vendor
+
+# next.js
+/.next/
+/out/
+next-env.d.ts
+*.tsbuildinfo
+
+# env files
 .env
-.env.backup
+.env*.local
 .env.production
-.phpactor.json
-.phpunit.result.cache
-Homestead.json
-Homestead.yaml
-npm-debug.log
-yarn-error.log
-/auth.json
-/.fleet
+
+# vercel
+.vercel
+
+# local leftovers from the Laravel version
+*.sqlite
+
+# misc
+.DS_Store
+npm-debug.log*
 /.idea
-/.nova
 /.vscode
 /.zed

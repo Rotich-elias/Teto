@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" width="1200" height="750" role="img" aria-label="Abstract placeholder artwork">
+    <defs>
+        <linearGradient id="w3bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#042F2E"/>
+            <stop offset="0.5" stop-color="#0B1220"/>
+            <stop offset="1" stop-color="#134E4A"/>
+        </linearGradient>
+        <linearGradient id="w3phone" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#14B8A6" stop-opacity="0.35"/>
+            <stop offset="1" stop-color="#0F766E" stop-opacity="0.08"/>
+        </linearGradient>
+        <pattern id="w3dots" width="26" height="26" patternUnits="userSpaceOnUse">
+            <circle cx="1.5" cy="1.5" r="1.5" fill="#5EEAD4" opacity="0.2"/>
+        </pattern>
+        <filter id="w3shadow" x="-30%" y="-20%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="34" stdDeviation="36" flood-color="#021B1A" flood-opacity="0.6"/>
+        </filter>
+    </defs>
+
+    <rect width="1200" height="750" fill="url(#w3bg)"/>
+    <rect width="1200" height="750" fill="url(#w3dots)"/>
+    <circle cx="230" cy="120" r="260" fill="#F59E0B" opacity="0.1"/>
+    <circle cx="1030" cy="650" r="300" fill="#14B8A6" opacity="0.16"/>
+
+    <g stroke="#5EEAD4" stroke-opacity="0.35" stroke-width="2" fill="none">
+        <path d="M120 600 360 420 600 540 880 300 1090 390"/>
+        <path d="M360 420 470 190 880 300"/>
+    </g>
+    <g fill="#0B1220" stroke="#5EEAD4" stroke-width="3">
+        <circle cx="120" cy="600" r="11"/>
+        <circle cx="360" cy="420" r="9"/>
+        <circle cx="470" cy="190" r="11"/>
+        <circle cx="600" cy="540" r="9"/>
+        <circle cx="880" cy="300" r="11"/>
+        <circle cx="1090" cy="390" r="9"/>
+    </g>
+
+    <g filter="url(#w3shadow)">
+        <rect x="500" y="150" width="250" height="500" rx="44" fill="url(#w3phone)" stroke="#5EEAD4" stroke-opacity="0.55" stroke-width="2.5"/>
+        <rect x="520" y="178" width="210" height="444" rx="30" fill="#08111A" opacity="0.85"/>
+        <rect x="586" y="192" width="78" height="10" rx="5" fill="#5EEAD4" opacity="0.4"/>
+
+        <rect x="548" y="240" width="154" height="86" rx="16" fill="#0D9488" opacity="0.4" stroke="#5EEAD4" stroke-opacity="0.25"/>
+        <rect x="568" y="262" width="64" height="8" rx="4" fill="#99F6E4" opacity="0.8"/>
+        <rect x="568" y="282" width="96" height="6" rx="3" fill="#94A3B8" opacity="0.45"/>
+
+        <g>
+            <rect x="548" y="352" width="154" height="54" rx="14" fill="#0B1220" stroke="#5EEAD4" stroke-opacity="0.2"/>
+            <circle cx="578" cy="379" r="12" fill="#F59E0B" opacity="0.85"/>
+            <rect x="600" y="370" width="66" height="7" rx="3.5" fill="#94A3B8" opacity="0.6"/>
+            <rect x="600" y="384" width="44" height="6" rx="3" fill="#94A3B8" opacity="0.35"/>
+        </g>
+        <g>
+            <rect x="548" y="422" width="154" height="54" rx="14" fill="#0B1220" stroke="#5EEAD4" stroke-opacity="0.2"/>
+            <circle cx="578" cy="449" r="12" fill="#14B8A6" opacity="0.85"/>
+            <rect x="600" y="440" width="72" height="7" rx="3.5" fill="#94A3B8" opacity="0.6"/>
+            <rect x="600" y="454" width="38" height="6" rx="3" fill="#94A3B8" opacity="0.35"/>
+        </g>
+        <rect x="548" y="508" width="154" height="44" rx="22" fill="#0D9488"/>
+        <rect x="590" y="526" width="70" height="8" rx="4" fill="#99F6E4" opacity="0.9"/>
+    </g>
+
+    <text x="64" y="694" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="600" letter-spacing="5" fill="#99F6E4">PLACEHOLDER ARTWORK</text>
+    <text x="1136" y="694" text-anchor="end" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="600" letter-spacing="3" fill="#FCD34D">TODO(OWNER)</text>
+</svg>
