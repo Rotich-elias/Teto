@@ -7,7 +7,7 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs"
+    "db:migrate": "node scripts/migrate.mjs"
   },
   "engines": {
     "node": ">=20.9"

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { validateContact, type ContactFields } from '@/lib/contact';
 import { sendContactEmails } from '@/lib/contact-mail';
+import { databaseConfigured, saveContactMessage } from '@/lib/db';
 import { rateLimit } from '@/lib/rate-limit';
 import { findService } from '@/lib/site';
 import { verifyTurnstile } from '@/lib/turnstile';
@@ -52,6 +53,20 @@ export async function POST(request: Request) {
   }
 
   const serviceName = findService(result.data.service)?.name ?? result.data.service;
+
+  // Store the enquiry first so a mail outage cannot lose it.
+  try {
+    if (databaseConfigured()) {
+      await saveContactMessage(result.data, {
+        ip,
+        userAgent: (request.headers.get('user-agent') ?? '').slice(0, 500),
+      });
+    } else {
+      console.warn('Contact message not stored: DATABASE_URL is not configured.');
+    }
+  } catch (error) {
+    console.error('Failed to store contact message.', error);
+  }
 
   try {
     await sendContactEmails(result.data, serviceName);
