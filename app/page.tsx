@@ -184,8 +184,8 @@ export default function HomePage() {
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <SectionHeading
               eyebrow="Selected work"
-              title="Case studies, once the details are approved."
-              text="We publish client work only with permission. These entries are placeholders for approved project details."
+              title="Work we can talk about."
+              text="A selection of client projects and our own products. Results are added once the client confirms them."
             />
             <Link href="/portfolio" className="btn-link shrink-0">
               View all work

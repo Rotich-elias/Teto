@@ -19,11 +19,11 @@ export default function PortfolioPage() {
       <PageHero
         eyebrow="Portfolio"
         title="Work we can talk about."
-        lead="We publish client work only with permission. The entries below are placeholders until approved project details are supplied."
+        lead="A selection of client projects and our own products. We publish client work only with permission, and results are added once the client confirms them."
       >
         <div className="mt-6 inline-flex items-center gap-2 rounded-xl border border-dashed border-accent-600/60 bg-accent-50 px-3.5 py-2 text-xs font-medium text-accent-900 dark:border-accent-400/50 dark:bg-accent-500/10 dark:text-accent-300">
           <Icon name="alert" className="h-4 w-4 shrink-0" />
-          Placeholder content — no client, result or statistic on this page is real yet.
+          Results are still pending client confirmation and are marked TODO(owner).
         </div>
       </PageHero>
 
@@ -93,6 +93,15 @@ export default function PortfolioPage() {
                     <Todo label="tech used" />
                   )}
                 </div>
+
+                {project.url ? (
+                  <div className="mt-4">
+                    <a href={project.url} target="_blank" rel="noopener noreferrer" className="btn-secondary text-sm">
+                      Visit site
+                      <Icon name="arrow-up-right" className="h-4 w-4" />
+                    </a>
+                  </div>
+                ) : null}
               </div>
             </div>
           </article>

@@ -43,6 +43,7 @@ export type Project = {
   result: string | null;
   tech: string[];
   image: string;
+  url: string | null;
 };
 
 export type Product = {
@@ -266,25 +267,67 @@ export const tech = [
 ];
 
 /**
- * Portfolio entries are placeholders until the owner supplies approved
- * project details. Never fill these with invented clients or results.
+ * Client work and in-house products. `problem` and `solution` describe what was
+ * built; `result` stays null until the owner supplies a verified outcome. Never
+ * invent clients, metrics or results.
  */
-const emptyProject = (image: string): Project => ({
-  title: null,
-  client: 'Confidential',
-  sector: null,
-  summary: null,
-  problem: null,
-  solution: null,
-  result: null,
-  tech: [],
-  image,
-});
-
 export const portfolio: Project[] = [
-  emptyProject('/images/work-1.svg'),
-  emptyProject('/images/work-2.svg'),
-  emptyProject('/images/work-3.svg'),
+  {
+    title: 'Bhilzak Construction and Supplies',
+    client: 'Bhilzak Construction and Supplies Limited',
+    sector: 'Construction',
+    summary: 'A Kenyan building contractor and supplier of precast concrete, steel and paving products.',
+    problem:
+      'Bhilzak needed one credible online home to win construction contracts and sell its own precast, steel and paving products.',
+    solution:
+      'A Next.js website with service and project pages, an online supplies catalogue and quote-request flows, built to load quickly on mobile.',
+    result: null,
+    tech: ['Next.js', 'React'],
+    image: '/images/work-bhilzak.png',
+    url: 'https://bhilzak.vercel.app',
+  },
+  {
+    title: 'UkweliTally',
+    client: 'Teto Technologies',
+    sector: 'Civic technology',
+    summary: 'Independent election results tallying for candidates, agents and observers.',
+    problem:
+      'Results are captured at tens of thousands of polling stations and have to be aggregated and trusted quickly, often on poor networks.',
+    solution:
+      'An offline-first Next.js PWA that captures Form 34A photos with GPS, extracts numbers with OCR, applies role-based access and tallies results in real time from station to county.',
+    result: null,
+    tech: ['Next.js', 'React', 'Tailwind CSS'],
+    image: '/images/work-ukwelitally.png',
+    url: 'https://ukwelitally.teto.co.ke/',
+  },
+  {
+    title: 'Techlup',
+    client: 'Techlup',
+    sector: 'Cloud & IT services',
+    summary: 'Business email, managed cloud hosting and custom software development.',
+    problem:
+      'Techlup needed to present business email, managed hosting and custom software to a non-technical audience in one place.',
+    solution:
+      'A fast React single-page site with light and dark theming that explains the email, hosting and software services and routes enquiries.',
+    result: null,
+    tech: ['React', 'Vite', 'Tailwind CSS'],
+    image: '/images/work-techlup.png',
+    url: 'https://techlup.co.ke/',
+  },
+  {
+    title: 'CAFHED',
+    client: 'Community Alliance for Health and Development',
+    sector: 'Health & development',
+    summary: 'Community health and development programmes across Kenya, built around the EMPOWER360 model.',
+    problem:
+      'A community health organisation needed to present its programmes, impact and donation options to partners and the public.',
+    solution:
+      'A Laravel website with programme, impact, gallery, news and donation pages, including M-Pesa and bank donation details.',
+    result: null,
+    tech: ['Laravel', 'Bootstrap'],
+    image: '/images/work-cafhed.png',
+    url: 'http://cafhedkenya.org/',
+  },
 ];
 
 /**
@@ -294,15 +337,16 @@ export const portfolio: Project[] = [
  */
 export const products: Product[] = [
   {
-    name: null,
+    name: 'UkweliTally',
     kind: 'app',
-    summary: null,
-    description: null,
-    image: '/images/work-1.svg',
+    summary: 'Independent election results tallying for candidates, agents and observers.',
+    description:
+      'Photo and GPS evidence on every result, offline-first capture, role-based access and real-time tallying from polling station to county.',
+    image: '/images/work-ukwelitally.png',
     downloadUrl: null,
-    websiteUrl: null,
-    platforms: [],
-    status: null,
+    websiteUrl: 'https://ukwelitally.teto.co.ke/',
+    platforms: ['Web (PWA)'],
+    status: 'Available',
   },
 ];
 

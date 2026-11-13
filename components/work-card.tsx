@@ -32,11 +32,19 @@ export function WorkCard({ project, index }: { project: Project; index: number }
         </p>
 
         <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-4">
-          <span className="text-xs font-medium text-ink-muted">Client: {project.client}</span>
-          <Link href="/portfolio" className="btn-link text-xs">
-            View case study
-            <Icon name="arrow-up-right" className="h-3.5 w-3.5" />
-          </Link>
+          <span className="min-w-0 truncate text-xs font-medium text-ink-muted">Client: {project.client}</span>
+          <span className="flex shrink-0 items-center gap-3">
+            {project.url ? (
+              <a href={project.url} target="_blank" rel="noopener noreferrer" className="btn-link text-xs">
+                Visit site
+                <Icon name="arrow-up-right" className="h-3.5 w-3.5" />
+              </a>
+            ) : null}
+            <Link href="/portfolio" className="btn-link text-xs">
+              Case study
+              <Icon name="arrow-right" className="h-3.5 w-3.5" />
+            </Link>
+          </span>
         </div>
       </div>
     </article>

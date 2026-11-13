@@ -19,12 +19,7 @@ export default function ProductsPage() {
         eyebrow="Products"
         title="Apps and products we've built."
         lead="Download our mobile apps or visit live websites. New releases and links will be added here."
-      >
-        <div className="mt-6 inline-flex items-center gap-2 rounded-xl border border-dashed border-accent-600/60 bg-accent-50 px-3.5 py-2 text-xs font-medium text-accent-900 dark:border-accent-400/50 dark:bg-accent-500/10 dark:text-accent-300">
-          <Icon name="alert" className="h-4 w-4 shrink-0" />
-          Placeholder content — no product, download link or result on this page is real yet.
-        </div>
-      </PageHero>
+      />
 
       <div className="container-page py-14 sm:py-16">
         {products.length === 0 ? (
