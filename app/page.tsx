@@ -4,10 +4,9 @@ import { Icon } from '@/components/icon';
 import { Cta } from '@/components/cta';
 import { Schema } from '@/components/schema';
 import { SectionHeading } from '@/components/section-heading';
-import { ServiceCard } from '@/components/service-card';
 import { WorkCard } from '@/components/work-card';
 import { pageMetadata } from '@/lib/metadata';
-import { portfolio, processSteps, services, tech, values } from '@/lib/site';
+import { company, portfolio, processSteps, services, tech, values } from '@/lib/site';
 
 export const metadata = pageMetadata({
   title: 'Teto Technologies | Software and Networks That Work in Kenya',
@@ -96,45 +95,83 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((service) => (
-            <ServiceCard key={service.slug} service={service} />
-          ))}
+        <div className="mt-10 border-t border-line">
+          {services.map((service, index) => (
+            <Link
+              key={service.slug}
+              href={`/services/${service.slug}`}
+              className="group grid grid-cols-1 items-baseline gap-2 border-b border-line py-6 transition-colors hover:bg-surface-raised md:grid-cols-[1fr_1.6fr_auto] md:gap-8 md:px-4"
+            >
+              <span className="flex items-center gap-3">
+                <span className="w-6 shrink-0 font-display text-xs font-extrabold text-ink-muted">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-50 text-primary-700 ring-1 ring-inset ring-primary-600/10 dark:bg-primary-500/10 dark:text-primary-300">
+                  <Icon name={service.icon} className="h-5 w-5" />
+                </span>
+                <span className="text-lg font-bold text-ink transition-colors group-hover:text-primary-700 dark:group-hover:text-primary-300">
+                  {service.name}
+                </span>
+              </span>
 
+              <span className="max-w-2xl text-sm leading-relaxed text-ink-soft">{service.short}</span>
+
+              <span className="hidden self-center text-ink-muted transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary-700 md:block dark:group-hover:text-primary-300">
+                <Icon name="arrow-right" className="h-5 w-5" />
+              </span>
+            </Link>
+          ))}
+        </div>
+
+        <div className="mt-8">
           <Link
             href="/contact"
-            className="group flex h-full flex-col justify-between rounded-2xl border border-dashed border-primary-600/40 bg-primary-50/60 p-6 transition hover:-translate-y-1 hover:border-primary-600 hover:shadow-lift dark:bg-primary-500/5"
+            className="group inline-flex flex-wrap items-center gap-3 rounded-2xl border border-dashed border-primary-600/40 bg-primary-50/60 px-5 py-4 text-sm font-semibold text-primary-800 transition hover:border-primary-600 dark:bg-primary-500/5 dark:text-primary-200"
           >
-            <span className="grid h-12 w-12 place-items-center rounded-xl bg-surface-raised text-primary-700 ring-1 ring-inset ring-primary-600/10 dark:bg-primary-500/10 dark:text-primary-300">
-              <Icon name="spark" className="h-6 w-6" />
-            </span>
-            <div className="mt-5">
-              <h3 className="text-lg font-bold">Not sure where to start?</h3>
-              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                Tell us what you are trying to solve. We will point you to the right service — or say if we are not the right fit.
-              </p>
-              <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-700 dark:text-primary-300">
-                Talk to us
-                <Icon name="arrow-right" className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </span>
-            </div>
+            <Icon name="spark" className="h-5 w-5" />
+            Not sure where to start? Tell us what you are trying to solve.
+            <Icon name="arrow-right" className="h-4 w-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
       </section>
 
-      {/* Why Teto */}
-      <section className="border-y border-line bg-surface-sunken">
-        <div className="container-page grid gap-10 py-16 sm:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16 lg:py-24">
-          <div>
-            <SectionHeading
-              eyebrow="Why Teto"
-              title="Built by people who understand the environment it runs in."
-              text="Good software is only half the job. The payment callback, the router, the server and the support behind it all have to hold together."
-            />
+      {/* Why Teto — dark band */}
+      <section className="relative overflow-hidden bg-primary-950 text-white">
+        <div className="pointer-events-none absolute inset-0 opacity-[0.18] dot-grid" />
+        <div className="pointer-events-none absolute -right-32 -top-24 h-96 w-96 rounded-full accent-glow" />
+        <div className="pointer-events-none absolute -bottom-40 -left-24 h-96 w-96 rounded-full hero-glow" />
 
-            <div className="mt-8 rounded-2xl border border-line bg-surface-raised p-5">
-              <p className="flex items-start gap-3 text-sm leading-relaxed text-ink-soft">
-                <Icon name="quote" className="mt-0.5 h-5 w-5 shrink-0 text-accent-500" />
+        <div className="container-page relative grid gap-12 py-16 sm:py-20 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16 lg:py-24">
+          <div>
+            <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary-200">
+              <span className="block h-px w-6 bg-accent-400" />
+              Why Teto
+            </p>
+            <h2 className="mt-3 text-3xl font-extrabold leading-tight text-white sm:text-4xl">
+              Built by people who understand the environment it runs in.
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-primary-100/80">
+              Good software is only half the job. The payment callback, the router, the server and the support behind it all have to hold together.
+            </p>
+
+            <dl className="mt-8 grid grid-cols-3 gap-6 border-t border-white/10 pt-6">
+              <div>
+                <dt className="font-display text-3xl font-extrabold text-white">{services.length}</dt>
+                <dd className="mt-1 text-xs font-semibold uppercase tracking-wider text-primary-200">Services</dd>
+              </div>
+              <div>
+                <dt className="font-display text-3xl font-extrabold text-white">{company.founded ?? '—'}</dt>
+                <dd className="mt-1 text-xs font-semibold uppercase tracking-wider text-primary-200">Founded</dd>
+              </div>
+              <div>
+                <dt className="font-display text-3xl font-extrabold text-white">Kenya</dt>
+                <dd className="mt-1 text-xs font-semibold uppercase tracking-wider text-primary-200">Based in</dd>
+              </div>
+            </dl>
+
+            <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
+              <p className="flex items-start gap-3 text-sm leading-relaxed text-primary-100/85">
+                <Icon name="quote" className="mt-0.5 h-5 w-5 shrink-0 text-accent-400" />
                 <span>We build for Kenyan users and networks, and hold the work to the engineering standards expected anywhere.</span>
               </p>
             </div>
@@ -142,12 +179,12 @@ export default function HomePage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             {values.map((value) => (
-              <div key={value.title} className="card p-6">
-                <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300">
+              <div key={value.title} className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+                <span className="grid h-11 w-11 place-items-center rounded-xl bg-white/10 text-primary-200">
                   <Icon name={value.icon} className="h-5 w-5" />
                 </span>
-                <h3 className="mt-4 text-base font-bold">{value.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-ink-soft">{value.text}</p>
+                <h3 className="mt-4 text-base font-bold text-white">{value.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-primary-100/75">{value.text}</p>
               </div>
             ))}
           </div>
