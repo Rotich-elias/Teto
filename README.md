@@ -21,8 +21,10 @@ Marketing website for **Teto Technologies** (teto.co.ke), a Kenyan technology co
 - Floating WhatsApp button driven by `TETO_WHATSAPP`.
 - Every “Get a Quote” link points to `/contact?service=<slug>` and preselects the service.
 - SEO: unique titles and descriptions, canonical URLs, Open Graph/Twitter metadata, JSON-LD, `sitemap.xml`, and `robots.txt`.
+- Security headers (CSP, HSTS, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, COOP) set in `next.config.ts`.
 - Responsive layout with light/dark mode via `prefers-color-scheme`.
 - Self-hosted Inter and Plus Jakarta Sans fonts.
+- Vitest unit tests for contact validation, site helpers and the rate limiter.
 
 ## Tech stack
 
@@ -174,14 +176,16 @@ Set `NEXT_PUBLIC_SITE_URL` before generating the sitemap so absolute URLs are co
 - Contact submissions are validated server-side and stored/emailed with parameterised queries.
 - Secrets are read from environment variables; `.env*` files are git-ignored.
 - Honeypot, rate limiting and optional Turnstile on the contact form.
+- Security headers are set for every route in `next.config.ts`: `Content-Security-Policy`, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`, `X-Permitted-Cross-Domain-Policies`, and (in production) `Strict-Transport-Security`.
+- The CSP only allows the Cloudflare Turnstile and Google Maps sources when those features are configured, and adds `'unsafe-eval'`/websocket sources in development only.
 
-> **Not yet ported:** the Laravel app shipped security headers (CSP, HSTS, `X-Frame-Options`, `Referrer-Policy`, etc.) via middleware. These need to be re-added with a `next.config` `headers()` block or `middleware.ts` before launch.
+> **Note on CSP:** Next.js emits inline bootstrap scripts, so the policy allows `'unsafe-inline'` for `script-src`/`style-src` while pages stay statically rendered. A stricter nonce-based policy (as the Laravel app used) is possible with `middleware.ts`, but it opts every page into dynamic rendering. Revisit if a stricter policy is required.
 
 ---
 
 ## Testing
 
-Vitest is configured (`vitest.config.ts`) but no tests exist yet. `lib/contact.ts` and `lib/contact-mail.ts` are pure functions and are the easiest first targets.
+Vitest unit tests cover contact validation, the site helpers and the rate limiter.
 
 ```bash
 npm run typecheck
@@ -208,7 +212,7 @@ npm run build
 - [ ] Set `RESEND_API_KEY`, `CONTACT_TO_EMAIL` and a verified `CONTACT_FROM_EMAIL`, then send a test enquiry end-to-end.
 - [ ] Fill in all `TETO_*` company details.
 - [ ] Replace the placeholder portfolio and team content.
-- [ ] Re-add security headers (see Security above).
+- [ ] Confirm the security headers in `next.config.ts` match the production domain (and the CSP once Turnstile/Maps are configured).
 - [ ] Configure database backups, and test a restore.
 - [ ] Configure uptime and error monitoring.
 - [ ] Review the privacy policy and terms with a qualified adviser.
@@ -298,6 +302,9 @@ lib/
   rate-limit.ts           In-memory rate limiter
   metadata.ts             Per-page metadata helper
 scripts/migrate.mjs       Creates the contact_messages table
+next.config.ts            Security headers and Turbopack root
+tests/                    Vitest unit tests
+vitest.config.mts         Vitest configuration
 public/                   Favicons, images
 ```
 
