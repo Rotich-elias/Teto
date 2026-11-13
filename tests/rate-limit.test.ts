@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { rateLimit } from '@/lib/rate-limit';
+import { contactRateLimit, rateLimit } from '@/lib/rate-limit';
 
 function uniqueKey(): string {
   return `test:${Math.random().toString(36).slice(2)}`;
@@ -26,5 +26,17 @@ describe('rateLimit', () => {
 
     expect(rateLimit(first, 5)).toBe(false);
     expect(rateLimit(second, 5)).toBe(true);
+  });
+});
+
+describe('contactRateLimit', () => {
+  it('falls back to the in-memory limiter when no database is configured', async () => {
+    const ip = uniqueKey();
+
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      await expect(contactRateLimit(ip, 5)).resolves.toBe(true);
+    }
+
+    await expect(contactRateLimit(ip, 5)).resolves.toBe(false);
   });
 });

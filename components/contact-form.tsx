@@ -137,7 +137,7 @@ export function ContactForm({
   const invalid = (name: string) => (errors[name] ? 'true' : undefined);
 
   return (
-    <div className="card p-5 sm:p-8">
+    <div id="enquiry" className="card scroll-mt-24 p-5 sm:p-8">
       {success ? (
         <div
           ref={successRef}
@@ -158,7 +158,7 @@ export function ContactForm({
           </button>
         </div>
       ) : (
-        <form ref={formRef} onSubmit={submit} noValidate className="relative">
+        <form ref={formRef} action="/api/contact" method="post" onSubmit={submit} noValidate className="relative">
           <h2 className="text-xl font-bold">Project enquiry</h2>
           <p className="mt-1 text-sm text-ink-soft">
             Fields marked <span className="text-red-600 dark:text-red-400">*</span> are required.

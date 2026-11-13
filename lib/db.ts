@@ -33,3 +33,20 @@ export async function saveContactMessage(data: ContactData, meta: ContactMessage
     [data.name, data.email, data.phone, data.service, data.message, meta.ip, meta.userAgent],
   );
 }
+
+/**
+ * Count stored submissions from an IP within the window. Used to share the
+ * contact-form rate limit across serverless instances.
+ */
+export async function countRecentContactMessages(ip: string, windowMinutes = 60): Promise<number> {
+  const sql = getClient();
+
+  const rows = (await sql.query(
+    `SELECT count(*)::int AS count
+       FROM contact_messages
+      WHERE ip = $1 AND created_at > now() - ($2::int * interval '1 minute')`,
+    [ip, windowMinutes],
+  )) as Array<{ count: number }>;
+
+  return Number(rows[0]?.count ?? 0);
+}

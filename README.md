@@ -15,9 +15,9 @@ Marketing website for **Teto Technologies** (teto.co.ke), a Kenyan technology co
   - database storage in `contact_messages` (Neon Postgres, via `lib/db.ts`);
   - notification to the company inbox and an auto-reply to the sender (Resend);
   - honeypot field;
-  - best-effort rate limit of 5 submissions per hour per IP;
+  - best-effort rate limit of 5 submissions per hour per IP, shared across serverless instances via the database when one is configured;
   - optional Cloudflare Turnstile;
-  - AJAX success/error states.
+  - AJAX success/error states, plus a no-JavaScript POST fallback that redirects back to `/contact?status=…`.
 - Floating WhatsApp button driven by `TETO_WHATSAPP`.
 - Every “Get a Quote” link points to `/contact?service=<slug>` and preselects the service.
 - SEO: unique titles and descriptions, canonical URLs, Open Graph/Twitter metadata, JSON-LD, `sitemap.xml`, and `robots.txt`.
@@ -35,7 +35,7 @@ Marketing website for **Teto Technologies** (teto.co.ke), a Kenyan technology co
 | Styling | Tailwind CSS 3 |
 | Database | Neon serverless Postgres (`@neondatabase/serverless`) |
 | Mail | [Resend](https://resend.com) |
-| Tests | Vitest (configured; test files pending) |
+| Tests | Vitest (`tests/`) |
 | Deployment | Vercel (or any Node 20+ host) |
 
 ---
@@ -127,15 +127,18 @@ The honeypot and rate limit work without Turnstile.
 
 ## Contact form behaviour
 
-1. The request passes through an in-memory rate limiter (5 per hour per IP).
+1. The request passes through the rate limiter: an in-memory fast path plus, when `DATABASE_URL` is set, a count of recent `contact_messages` for the same IP so the limit is shared across serverless instances (5 per hour per IP). The database check fails open if it errors.
 2. `lib/contact.ts` validates the fields and rejects honeypot submissions.
 3. If Turnstile is enabled, the token is verified server-side (`lib/turnstile.ts`).
 4. The enquiry is stored in `contact_messages` **before** email is attempted.
 5. The company notification is sent to `CONTACT_TO_EMAIL`; the sender receives an auto-reply.
 6. Storage and mail failures are logged and do not lose the enquiry or surface as an error.
-7. The endpoint returns `201`/`400`/`422`/`429` JSON responses.
 
-> **Not yet ported:** the Laravel version had a no-JavaScript POST fallback. The React form currently requires JavaScript. Rate limiting is in-memory and resets when a serverless instance recycles — put a shared limiter (e.g. Upstash Redis) in front of it for real protection.
+The endpoint accepts both a JSON body (the React form) and a `application/x-www-form-urlencoded` body (the no-JavaScript fallback). JSON requests receive `201`/`400`/`422`/`429` JSON responses; form posts receive a `303` redirect to `/contact?status=sent|invalid|rate|verify#enquiry`, which the contact page renders as a banner.
+
+> **No-JS limitation:** when JavaScript is unavailable and validation fails, the redirect does not preserve the values the visitor typed — they are returned to an empty form with an error banner. A richer fallback (flash values in a short-lived signed cookie) can be added later if required.
+>
+> **Rate limiting:** the database-backed count is per-IP and covers stored submissions. If you need protection that does not depend on the database, put a shared limiter (e.g. Upstash Redis) in front of the endpoint.
 
 ### Database schema
 
@@ -299,7 +302,7 @@ lib/
   contact-mail.ts         Resend notification + auto-reply
   db.ts                   Neon Postgres client and insert
   turnstile.ts            Cloudflare Turnstile verification
-  rate-limit.ts           In-memory rate limiter
+  rate-limit.ts           In-memory limiter plus a database-backed contact limit
   metadata.ts             Per-page metadata helper
 scripts/migrate.mjs       Creates the contact_messages table
 next.config.ts            Security headers and Turbopack root

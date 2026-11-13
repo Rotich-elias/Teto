@@ -13,14 +13,31 @@ export const metadata = pageMetadata({
   path: '/contact',
 });
 
+const statusBanners: Record<string, { tone: 'success' | 'error'; title: string; text: string }> = {
+  sent: {
+    tone: 'success',
+    title: 'Message sent',
+    text: 'Thank you — your message has been received. We will get back to you as soon as we can.',
+  },
+  invalid: { tone: 'error', title: 'Could not send', text: 'Please check your details and try again.' },
+  rate: {
+    tone: 'error',
+    title: 'Too many messages',
+    text: 'Too many messages from this connection. Please wait an hour or email us directly.',
+  },
+  verify: { tone: 'error', title: 'Verification failed', text: 'We could not verify the challenge. Please try again.' },
+};
+
 export default async function ContactPage({
   searchParams,
 }: {
-  searchParams: Promise<{ service?: string | string[] }>;
+  searchParams: Promise<{ service?: string | string[]; status?: string | string[] }>;
 }) {
   const params = await searchParams;
   const requested = Array.isArray(params.service) ? params.service[0] : params.service;
   const selectedService = requested && findService(requested) ? requested : '';
+  const statusParam = Array.isArray(params.status) ? params.status[0] : params.status;
+  const banner = statusParam ? statusBanners[statusParam] : undefined;
   const turnstileSiteKey = process.env.TURNSTILE_ENABLED === 'true' ? process.env.TURNSTILE_SITE_KEY : undefined;
   const whatsapp = whatsappHref();
 
@@ -36,6 +53,27 @@ export default async function ContactPage({
       />
 
       <section className="container-page py-12 sm:py-16">
+        {banner ? (
+          <div
+            role={banner.tone === 'success' ? 'status' : 'alert'}
+            aria-live="polite"
+            className={`mb-8 flex items-start gap-3 rounded-2xl border p-4 sm:p-5 ${
+              banner.tone === 'success'
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-200'
+                : 'border-red-200 bg-red-50 text-red-900 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-200'
+            }`}
+          >
+            <Icon
+              name={banner.tone === 'success' ? 'check-circle' : 'alert'}
+              className="mt-0.5 h-5 w-5 shrink-0"
+            />
+            <div>
+              <p className="text-sm font-bold">{banner.title}</p>
+              <p className="mt-0.5 text-sm leading-relaxed">{banner.text}</p>
+            </div>
+          </div>
+        ) : null}
+
         <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-10">
           <ContactForm services={services.map(({ slug, name }) => ({ slug, name }))} selectedService={selectedService} turnstileSiteKey={turnstileSiteKey} />
 

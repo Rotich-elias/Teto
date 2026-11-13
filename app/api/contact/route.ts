@@ -2,9 +2,14 @@ import { NextResponse } from 'next/server';
 import { validateContact, type ContactFields } from '@/lib/contact';
 import { sendContactEmails } from '@/lib/contact-mail';
 import { databaseConfigured, saveContactMessage } from '@/lib/db';
-import { rateLimit } from '@/lib/rate-limit';
+import { contactRateLimit } from '@/lib/rate-limit';
 import { findService } from '@/lib/site';
 import { verifyTurnstile } from '@/lib/turnstile';
+
+/** Outcome shown to no-JavaScript users as `/contact?status=<outcome>`. */
+type Outcome = 'sent' | 'invalid' | 'rate' | 'verify';
+
+const SUCCESS_MESSAGE = 'Thank you — your message has been received. We will get back to you as soon as we can.';
 
 function clientIp(request: Request): string {
   const forwarded = request.headers.get('x-forwarded-for');
@@ -12,44 +17,75 @@ function clientIp(request: Request): string {
   return request.headers.get('x-real-ip')?.trim() || 'unknown';
 }
 
-export async function POST(request: Request) {
-  let payload: Partial<ContactFields>;
+function wantsJson(request: Request): boolean {
+  return (request.headers.get('content-type') ?? '').includes('application/json');
+}
+
+/** Accept either a JSON body (the React form) or a form-encoded POST (no JS). */
+async function parseFields(request: Request): Promise<Partial<ContactFields> | null> {
   try {
-    payload = (await request.json()) as Partial<ContactFields>;
+    if (wantsJson(request)) {
+      return (await request.json()) as Partial<ContactFields>;
+    }
+
+    const form = await request.formData();
+    return {
+      name: String(form.get('name') ?? ''),
+      email: String(form.get('email') ?? ''),
+      phone: String(form.get('phone') ?? ''),
+      service: String(form.get('service') ?? ''),
+      message: String(form.get('message') ?? ''),
+      consent: form.get('consent') != null,
+      companyWebsite: String(form.get('company_website') ?? ''),
+      turnstileToken: String(form.get('cf-turnstile-response') ?? ''),
+    };
   } catch {
-    return NextResponse.json({ message: 'Invalid request.' }, { status: 400 });
+    return null;
+  }
+}
+
+function redirect(request: Request, outcome: Outcome): NextResponse {
+  const url = new URL('/contact', request.url);
+  url.searchParams.set('status', outcome);
+  url.hash = 'enquiry';
+  return NextResponse.redirect(url, 303);
+}
+
+export async function POST(request: Request) {
+  const jsonMode = wantsJson(request);
+  const fields = await parseFields(request);
+
+  const respond = (outcome: Outcome, message: string, status: number, errors?: Record<string, string>) => {
+    if (jsonMode) {
+      return NextResponse.json(errors ? { message, errors } : { message }, { status });
+    }
+    return redirect(request, outcome);
+  };
+
+  if (!fields) {
+    return respond('invalid', 'Invalid request.', 400);
   }
 
   // Honeypot: accept and discard so bots do not learn the field is trapped.
-  if (typeof payload.companyWebsite === 'string' && payload.companyWebsite.trim() !== '') {
-    return NextResponse.json({ message: 'Thank you — your message has been received.' }, { status: 201 });
+  if (typeof fields.companyWebsite === 'string' && fields.companyWebsite.trim() !== '') {
+    return respond('sent', SUCCESS_MESSAGE, 201);
   }
 
   const ip = clientIp(request);
-  if (!rateLimit(`contact:${ip}`)) {
-    return NextResponse.json(
-      { message: 'Too many messages from this connection. Please wait an hour or email us directly.' },
-      { status: 429 },
-    );
+  if (!(await contactRateLimit(ip))) {
+    return respond('rate', 'Too many messages from this connection. Please wait an hour or email us directly.', 429);
   }
 
-  const result = validateContact(payload);
+  const result = validateContact(fields);
   if (result.errors) {
-    return NextResponse.json(
-      { message: 'Please check the highlighted fields and try again.', errors: result.errors },
-      { status: 422 },
-    );
+    return respond('invalid', 'Please check the highlighted fields and try again.', 422, result.errors);
   }
 
-  const verified = await verifyTurnstile(payload.turnstileToken, ip);
+  const verified = await verifyTurnstile(fields.turnstileToken, ip);
   if (!verified) {
-    return NextResponse.json(
-      {
-        message: 'Please complete the verification challenge and try again.',
-        errors: { turnstile: 'Verification failed. Please try again.' },
-      },
-      { status: 422 },
-    );
+    return respond('verify', 'Please complete the verification challenge and try again.', 422, {
+      turnstile: 'Verification failed. Please try again.',
+    });
   }
 
   const serviceName = findService(result.data.service)?.name ?? result.data.service;
@@ -75,8 +111,5 @@ export async function POST(request: Request) {
     console.error('Contact notification failed.', error);
   }
 
-  return NextResponse.json(
-    { message: 'Thank you — your message has been received. We will get back to you as soon as we can.' },
-    { status: 201 },
-  );
+  return respond('sent', SUCCESS_MESSAGE, 201);
 }
