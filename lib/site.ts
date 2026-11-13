@@ -281,7 +281,7 @@ export const portfolio: Project[] = [
       'Bhilzak needed one credible online home to win construction contracts and sell its own precast, steel and paving products.',
     solution:
       'A Next.js website with service and project pages, an online supplies catalogue and quote-request flows, built to load quickly on mobile.',
-    result: null,
+    result: 'Site, supplies catalogue and quote form delivered and live at bhilzak.vercel.app.',
     tech: ['Next.js', 'React'],
     image: '/images/work-bhilzak.png',
     url: 'https://bhilzak.vercel.app',
@@ -295,7 +295,7 @@ export const portfolio: Project[] = [
       'Results are captured at tens of thousands of polling stations and have to be aggregated and trusted quickly, often on poor networks.',
     solution:
       'An offline-first Next.js PWA that captures Form 34A photos with GPS, extracts numbers with OCR, applies role-based access and tallies results in real time from station to county.',
-    result: null,
+    result: 'Platform delivered and live at ukwelitally.teto.co.ke, tallying from polling station to county.',
     tech: ['Next.js', 'React', 'Tailwind CSS'],
     image: '/images/work-ukwelitally.png',
     url: 'https://ukwelitally.teto.co.ke/',
@@ -309,7 +309,7 @@ export const portfolio: Project[] = [
       'Techlup needed to present business email, managed hosting and custom software to a non-technical audience in one place.',
     solution:
       'A fast React single-page site with light and dark theming that explains the email, hosting and software services and routes enquiries.',
-    result: null,
+    result: 'Site delivered and live at techlup.co.ke, presenting email, hosting and software services in one place.',
     tech: ['React', 'Vite', 'Tailwind CSS'],
     image: '/images/work-techlup.png',
     url: 'https://techlup.co.ke/',
@@ -323,7 +323,7 @@ export const portfolio: Project[] = [
       'A community health organisation needed to present its programmes, impact and donation options to partners and the public.',
     solution:
       'A Laravel website with programme, impact, gallery, news and donation pages, including M-Pesa and bank donation details.',
-    result: null,
+    result: 'Site delivered and live at cafhedkenya.org, publishing programmes, impact and donation options.',
     tech: ['Laravel', 'Bootstrap'],
     image: '/images/work-cafhed.png',
     url: 'http://cafhedkenya.org/',

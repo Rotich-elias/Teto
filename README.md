@@ -218,7 +218,7 @@ npm run build
 - [ ] Set `DATABASE_URL` and run `npm run db:migrate`; confirm the `contact_messages` table exists.
 - [ ] Set `RESEND_API_KEY`, `CONTACT_TO_EMAIL` and a verified `CONTACT_FROM_EMAIL`, then send a test enquiry end-to-end.
 - [ ] Fill in all `TETO_*` company details.
-- [ ] Confirm the case-study problem/solution copy and supply a verified result for each project; replace the remaining team placeholders.
+- [ ] Confirm the case-study copy and replace the delivery statements with verified results; replace the remaining team placeholders.
 - [ ] Confirm the security headers in `next.config.ts` match the production domain (and the CSP once Turnstile/Maps are configured).
 - [ ] Configure database backups, and test a restore.
 - [ ] Configure uptime and error monitoring.
@@ -239,7 +239,7 @@ Every item below must be supplied or approved by the site owner. Search the code
 - [x] Founder (`TETO_FOUNDER`): Rotich Elias.
 - [x] Supply the founding year (`TETO_FOUNDED`): 2019.
 - [ ] Supply the real mission statement and owner-supplied company history used on the about page.
-- [ ] Confirm the **problem** and **solution** copy for the four case studies on `/portfolio` (drafted from the live sites), and supply a **verified result** for each — results are currently `TODO(owner)`.
+- [ ] Confirm the **problem**, **solution** and **result** copy for the four case studies on `/portfolio`. The copy is drafted from the live sites and the results are factual delivery statements (no metrics) — replace them with specific, verified outcomes when available.
 - [ ] Confirm the client names on the case studies (Bhilzak, UkweliTally, Techlup, CAFHED) are approved for publication, and that the screenshots in `public/images/work-*.png` may be used.
 - [ ] Add further product entries for `/products` if needed — UkweliTally is already listed. Each needs a name, kind, summary, description, platforms, status, image and a download or website link.
 - [ ] Supply team names, roles, photos, and short bios (or confirm that the team section should be removed).
