@@ -238,8 +238,9 @@ Every item below must be supplied or approved by the site owner. Search the code
 - [ ] Approve the tagline and all service copy.
 - [x] Founder (`TETO_FOUNDER`): Rotich Elias.
 - [x] Supply the founding year (`TETO_FOUNDED`): 2019.
-- [ ] Supply the real mission statement used on the about page.
-- [ ] Supply three portfolio projects: title, sector, one-line summary, problem, solution, **verified** result, technologies, and an approved image.
+- [ ] Supply the real mission statement and owner-supplied company history used on the about page.
+- [ ] Supply three portfolio projects / case studies: title, sector, one-line summary, problem, solution, **verified** result, technologies, and an approved image (shown on `/portfolio` and the home “Selected work” section).
+- [ ] Supply product entries for `/products`: name, kind (app or website), summary, description, platforms, status, image, and a download or website link (or confirm the products page should be removed).
 - [ ] Supply team names, roles, photos, and short bios (or confirm that the team section should be removed).
 
 ### Contact and company details
