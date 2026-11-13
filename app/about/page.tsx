@@ -95,36 +95,6 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="container-page py-14 sm:py-16">
-        <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
-          <SectionHeading
-            eyebrow="The team"
-            title="Small team, direct communication."
-            text="Team names, photos and short bios are pending owner input. We will not invent people."
-          />
-          <Todo label="team names, photos and bios" className="shrink-0" />
-        </div>
-
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {[1, 2, 3].map((member) => (
-            <div key={member} className="card p-6">
-              <div className="grid h-14 w-14 place-items-center rounded-full bg-surface-sunken text-ink-muted">
-                <Icon name="code" className="h-6 w-6" />
-              </div>
-              <h3 className="mt-4 text-base font-bold">
-                <Todo label="team member name" />
-              </h3>
-              <p className="mt-2 text-sm font-medium text-primary-700 dark:text-primary-300">
-                <Todo label="role" />
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                <Todo label="short bio" />
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       <Cta title="Want to work with us?" text="Send a short description of the problem. We will reply with practical next steps." />
     </>
   );

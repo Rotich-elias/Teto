@@ -323,7 +323,7 @@ a database change.
 - [ ] `RESEND_API_KEY` set and `CONTACT_FROM_EMAIL` uses a verified domain.
 - [ ] `NEXT_PUBLIC_SITE_URL` set to the canonical HTTPS origin.
 - [ ] All `TETO_*` company details filled in; no `TODO(owner)` badges remain.
-- [ ] Portfolio and team placeholders replaced with owner-approved content.
+- [ ] Portfolio placeholders replaced with owner-approved content.
 - [ ] Domain resolves over HTTPS; HTTP redirects to HTTPS.
 - [ ] Post-deploy smoke test (section 6) passes end-to-end.
 - [ ] Backups, monitoring and Search Console configured.
