@@ -2,12 +2,17 @@ import { describe, expect, it } from 'vitest';
 import { findService, serviceName, services, telHref } from '@/lib/site';
 
 describe('site helpers', () => {
-  it('exposes the five configured services', () => {
-    expect(services).toHaveLength(5);
+  it('exposes the seven configured services', () => {
+    expect(services).toHaveLength(7);
   });
 
   it('finds a service by slug', () => {
     expect(findService('web-development')?.name).toBe('Web Development');
+  });
+
+  it('includes the business email and cloud hosting services', () => {
+    expect(findService('business-email')?.name).toBe('Business Email Hosting');
+    expect(findService('cloud-hosting')?.name).toBe('Managed Cloud Hosting');
   });
 
   it('returns undefined for an unknown slug', () => {

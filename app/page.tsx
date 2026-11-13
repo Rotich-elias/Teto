@@ -87,8 +87,8 @@ export default function HomePage() {
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <SectionHeading
             eyebrow="What we do"
-            title="One team for software, payments and networks."
-            text="Five focused services that cover the path from a first website to the infrastructure behind it."
+            title="One team for software, hosting, payments and networks."
+            text="Seven focused services that cover the path from a first website to the infrastructure behind it."
           />
           <Link href="/services" className="btn-link shrink-0">
             All services

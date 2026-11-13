@@ -6,9 +6,9 @@ import { pageMetadata } from '@/lib/metadata';
 import { services } from '@/lib/site';
 
 export const metadata = pageMetadata({
-  title: 'Software, Payments & Network Services | Teto Technologies',
+  title: 'Software, Hosting, Payments & Network Services | Teto Technologies',
   description:
-    'Explore Teto Technologies services: web development, Flutter mobile apps, M-Pesa Daraja integration, MikroTik networking and ICT support in Kenya.',
+    'Explore Teto Technologies services: web development, Flutter mobile apps, business email hosting, managed cloud hosting, M-Pesa Daraja integration, MikroTik networking and ICT support in Kenya.',
   path: '/services',
 });
 

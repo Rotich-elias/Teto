@@ -8,7 +8,7 @@ Marketing website for **Teto Technologies** (teto.co.ke), a Kenyan technology co
 
 ## What is included
 
-- Home, services index, five service detail pages, portfolio, products, about, contact, privacy, and terms pages.
+- Home, services index, seven service detail pages, portfolio, products, about, contact, privacy, and terms pages.
 - Friendly 404 page with `noindex`.
 - Contact form with:
   - server-side validation (see `lib/contact.ts`);
