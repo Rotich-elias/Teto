@@ -200,6 +200,10 @@ npm run build
 
 ## Deployment (Vercel)
 
+> **Full step-by-step runbook:** [`docs/deployment.md`](docs/deployment.md) —
+> Neon database, Resend domain, Vercel env vars, DNS/TLS, post-deploy smoke
+> test, rollback and troubleshooting.
+
 1. Import the repository into Vercel and set the framework preset to **Next.js**.
 2. Add the environment variables from `.env.example` in **Project → Settings → Environment Variables**.
 3. Set `NEXT_PUBLIC_SITE_URL` to the production origin (e.g. `https://teto.co.ke`).
@@ -305,6 +309,7 @@ lib/
   rate-limit.ts           In-memory limiter plus a database-backed contact limit
   metadata.ts             Per-page metadata helper
 scripts/migrate.mjs       Creates the contact_messages table
+docs/deployment.md        Deployment runbook
 next.config.ts            Security headers and Turbopack root
 tests/                    Vitest unit tests
 vitest.config.mts         Vitest configuration
