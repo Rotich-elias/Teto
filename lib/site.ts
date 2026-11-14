@@ -318,30 +318,78 @@ export const processSteps: ProcessStep[] = [
 ];
 
 export type TsoFeature = { icon: IconName; title: string; text: string };
+export type TsoStep = { step: string; title: string; text: string };
+export type TsoPackage = {
+  name: string;
+  tagline: string;
+  price: string | null; // null renders a TODO(owner) badge
+  priceNote: string;
+  features: string[];
+  cta: string;
+  featured?: boolean;
+  todo?: string;
+};
 
 /**
  * TSO — Take Schools Online. A flagship initiative Teto is building for
  * schools, with a focus on senior secondary schools. The wording below is a
- * first draft for the owner to confirm; unverified specifics stay as
- * TODO(owner) placeholders on the page.
+ * first draft for the owner to confirm; unverified specifics (prices, the
+ * sponsored package terms, launch details) stay as TODO(owner) placeholders.
  */
 export const tso = {
   name: 'TSO',
   fullName: 'Take Schools Online',
   status: 'In development',
-  lead: 'A flagship Teto initiative to bring senior secondary schools online — a credible web presence, digital communication with parents and students, and the systems behind admissions, records and results.',
+  lead: 'A flagship Teto initiative that gives schools a proper home online — a professionally built website, digital communication with parents and students, and the systems behind admissions, records and fees.',
   why: [
     'Parents and students look a school up online before they ever visit. A school with no website is easy to overlook.',
     'Notices, fee reminders and results still travel by phone calls, SMS chains and paper, which is slow and easy to lose.',
     'Schools run on records that should be searchable, backed up and safe — not scattered across exercise books and spreadsheets.',
   ],
+  steps: [
+    { step: '01', title: 'Tell us about your school', text: 'Send us your school details and what you want online. We reply with a short scope and the next steps.' },
+    { step: '02', title: 'We build it for you', text: 'Our team designs and builds the website and the systems behind it. No technical knowledge is needed from your side.' },
+    { step: '03', title: 'Go live and stay supported', text: 'Your school goes live, and we stay on for hosting, fixes and improvements as the school grows.' },
+  ],
   features: [
     { icon: 'web', title: 'School website', text: 'A fast, mobile-first website that presents the school, its programmes, staff, news and contacts.' },
     { icon: 'mail', title: 'Online admissions & enquiries', text: 'A clear enquiry and application path that reaches the right office instead of a personal phone number.' },
-    { icon: 'phone', title: 'Parent & student communication', text: 'Announcements, reminders and updates sent to parents and students instead of relying on notice boards.' },
+    { icon: 'phone', title: 'Parent & student communication', text: 'Announcements, reminders and updates published where parents and students can find them.' },
     { icon: 'layers', title: 'Digital student records', text: 'Student, class and staff records kept in one place, with role-based access for the people who need them.' },
     { icon: 'check-circle', title: 'Results & reporting', text: 'Internal assessments and reports captured digitally and shared with the right people, when they need them.' },
     { icon: 'payments', title: 'M-Pesa fee payments', text: 'Fee and activity payments collected through M-Pesa Daraja, with records reconciled against the student.' },
+  ],
+  packages: [
+    {
+      name: 'Standard',
+      tagline: 'A professionally built school website, fully managed.',
+      price: null,
+      priceNote: 'per year, all-in',
+      features: [
+        'A custom-built school website',
+        'Your own domain and hosting, set up for you',
+        'Pages for admissions, news, staff and contacts',
+        'Parent and student communication',
+        'M-Pesa fee payments',
+        'Ongoing maintenance and support',
+      ],
+      cta: 'Enquire about Standard',
+    },
+    {
+      name: 'Sponsored',
+      tagline: 'For schools that need a website but cannot fund one yet.',
+      price: 'No cost to the school',
+      priceNote: 'subject to eligibility',
+      features: [
+        'Everything in the Standard package',
+        'No cost to the school',
+        'The school actively promotes the website to parents and staff',
+        'Subject to eligibility and commitment review',
+      ],
+      cta: 'Apply for sponsorship',
+      featured: true,
+      todo: 'confirm the sponsored package terms and eligibility',
+    },
   ],
   audiences: ['Senior secondary schools', 'Boarding and day schools', 'School groups and academies'],
 } satisfies {
@@ -350,7 +398,9 @@ export const tso = {
   status: string;
   lead: string;
   why: string[];
+  steps: TsoStep[];
   features: TsoFeature[];
+  packages: TsoPackage[];
   audiences: string[];
 };
 
