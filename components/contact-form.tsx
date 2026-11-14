@@ -59,10 +59,14 @@ export function ContactForm({
   services,
   selectedService,
   turnstileSiteKey,
+  title = 'Project enquiry',
+  intro,
 }: {
   services: ServiceOption[];
   selectedService: string;
   turnstileSiteKey?: string;
+  title?: string;
+  intro?: string;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
@@ -159,7 +163,8 @@ export function ContactForm({
         </div>
       ) : (
         <form ref={formRef} action="/api/contact" method="post" onSubmit={submit} noValidate className="relative">
-          <h2 className="text-xl font-bold">Project enquiry</h2>
+          <h2 className="text-xl font-bold">{title}</h2>
+          {intro && <p className="mt-1 text-sm leading-relaxed text-ink-soft">{intro}</p>}
           <p className="mt-1 text-sm text-ink-soft">
             Fields marked <span className="text-red-600 dark:text-red-400">*</span> are required.
           </p>

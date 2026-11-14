@@ -239,7 +239,7 @@ Every item below must be supplied or approved by the site owner. Search the code
 - [x] Founder (`TETO_FOUNDER`): Rotich Elias.
 - [x] Supply the founding year (`TETO_FOUNDED`): 2019.
 - [ ] Approve the mission and vision statements drafted on the about page (`TETO_MISSION`, `TETO_VISION`) and any owner-supplied company history.
-- [ ] Review the **TSO — Take Schools Online** page (`/tso`): approve the concept copy and the planned feature list, confirm the package prices and the sponsored package terms, and supply the launch timeline and screenshots. It is a first draft of a programme Teto is building, so the specifics are marked `TODO(owner)`.
+- [ ] Review the **TSO — Take Schools Online** page (`/tso`): approve the concept copy and the planned feature list, confirm the package price, and supply screenshots when available. It is a first draft of a programme Teto is building, so the price is marked `TODO(owner)`.
 - [ ] Confirm the **problem**, **solution** and **result** copy for the four case studies on `/portfolio`. The copy is drafted from the live sites and the results are factual delivery statements (no metrics) — replace them with specific, verified outcomes when available.
 - [ ] Confirm the client names on the case studies (Bhilzak, UkweliTally, Techlup, CAFHED) are approved for publication, and that the screenshots in `public/images/work-*.png` may be used.
 - [ ] Add further product entries for `/products` if needed — UkweliTally is already listed. Each needs a name, kind, summary, description, platforms, status, image and a download or website link.

@@ -1,11 +1,10 @@
-import Link from 'next/link';
-import { Cta } from '@/components/cta';
+import { ContactForm } from '@/components/contact-form';
 import { Icon } from '@/components/icon';
 import { PageHero } from '@/components/page-hero';
 import { SectionHeading } from '@/components/section-heading';
 import { Todo } from '@/components/todo';
 import { pageMetadata } from '@/lib/metadata';
-import { tso } from '@/lib/site';
+import { services, tso } from '@/lib/site';
 
 export const metadata = pageMetadata({
   title: 'TSO — Take Schools Online | Teto Technologies',
@@ -15,6 +14,8 @@ export const metadata = pageMetadata({
 });
 
 export default function TsoPage() {
+  const turnstileSiteKey = process.env.TURNSTILE_ENABLED === 'true' ? process.env.TURNSTILE_SITE_KEY : undefined;
+
   return (
     <>
       <PageHero eyebrow="TSO — Take Schools Online" title="Give your school a digital home." lead={tso.lead} glow="accent">
@@ -57,7 +58,7 @@ export default function TsoPage() {
           <SectionHeading
             eyebrow="How it works"
             title="From an enquiry to a live website."
-            text="We handle the complexity so your school can focus on teaching."
+            text="Most schools go from a first enquiry to a live website in about three weeks. We handle the complexity so your school can focus on teaching."
           />
 
           <ol className="mt-10 grid gap-6 sm:grid-cols-3">
@@ -68,6 +69,10 @@ export default function TsoPage() {
                 </span>
                 <h3 className="mt-4 text-base font-bold">{step.title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-soft">{step.text}</p>
+                <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary-700 dark:text-primary-300">
+                  <Icon name="clock" className="h-3.5 w-3.5" />
+                  {step.duration}
+                </p>
               </li>
             ))}
           </ol>
@@ -79,7 +84,7 @@ export default function TsoPage() {
         <SectionHeading
           eyebrow="What TSO includes"
           title="A website and the systems behind it."
-          text="The starting scope for the platform. The final feature list is confirmed with each school."
+          text="The starting scope for the programme. The final feature list is confirmed with each school."
         />
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -95,69 +100,49 @@ export default function TsoPage() {
         </div>
       </section>
 
-      {/* Packages */}
+      {/* Package */}
       <section className="border-y border-line bg-surface-sunken">
         <div className="container-page py-14 sm:py-16">
           <SectionHeading
-            eyebrow="Packages"
-            title="Two ways to get your school online."
-            text="Both packages deliver a complete, professionally built school website. Prices and terms are confirmed with each school."
+            eyebrow="Package"
+            title="One package, fully managed."
+            text="A complete, professionally built school website. The price is confirmed with each school."
           />
 
-          <div className="mt-10 grid gap-6 lg:grid-cols-2">
-            {tso.packages.map((pkg) => (
-              <div
-                key={pkg.name}
-                className={`card flex flex-col p-6 sm:p-8 ${
-                  pkg.featured ? 'ring-2 ring-primary-600/30' : ''
-                }`}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <h3 className="text-xl font-extrabold">{pkg.name}</h3>
-                  {pkg.featured && (
-                    <span className="rounded-full bg-primary-50 px-3 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-primary-800 dark:bg-primary-500/10 dark:text-primary-200">
-                      Sponsored
-                    </span>
-                  )}
-                </div>
-                <p className="mt-2 text-sm leading-relaxed text-ink-soft">{pkg.tagline}</p>
+          <div className="card mt-10 grid gap-6 p-6 sm:p-8 lg:grid-cols-[1fr_1.15fr] lg:gap-10">
+            <div>
+              <h3 className="text-xl font-extrabold">{tso.plan.name}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-ink-soft">{tso.plan.tagline}</p>
 
-                <div className="mt-5 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                  {pkg.price ? (
-                    <span className="font-display text-3xl font-extrabold">{pkg.price}</span>
-                  ) : (
-                    <Todo label={`${pkg.name} package price`} />
-                  )}
-                  <span className="text-sm text-ink-muted">{pkg.priceNote}</span>
-                </div>
-
-                <ul className="mt-6 space-y-3 text-sm text-ink-soft">
-                  {pkg.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2.5">
-                      <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                {pkg.todo && (
-                  <p className="mt-5">
-                    <Todo label={pkg.todo} />
-                  </p>
+              <div className="mt-5 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                {tso.plan.price ? (
+                  <span className="font-display text-3xl font-extrabold">{tso.plan.price}</span>
+                ) : (
+                  <Todo label={`${tso.plan.name} package price`} />
                 )}
-
-                <div className="mt-auto pt-6">
-                  <Link href="/contact" className={pkg.featured ? 'btn-accent' : 'btn-primary'}>
-                    {pkg.cta}
-                    <Icon name="arrow-right" className="h-4 w-4" />
-                  </Link>
-                </div>
+                <span className="text-sm text-ink-muted">{tso.plan.priceNote}</span>
               </div>
-            ))}
+
+              <div className="mt-6">
+                <a href="#enrol" className="btn-primary">
+                  {tso.plan.cta}
+                  <Icon name="arrow-right" className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
+
+            <ul className="grid gap-3 text-sm text-ink-soft sm:grid-cols-2">
+              {tso.plan.features.map((feature) => (
+                <li key={feature} className="flex items-start gap-2.5">
+                  <Icon name="check" className="mt-0.5 h-4 w-4 shrink-0 text-primary-600 dark:text-primary-400" />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
           <p className="mt-6 flex flex-wrap items-center gap-2 text-sm text-ink-muted">
-            Package names, prices and the sponsored terms are a draft — <Todo label="confirm the TSO packages" />
+            The package name and price are a draft — <Todo label="confirm the TSO package and price" />
           </p>
         </div>
       </section>
@@ -179,10 +164,6 @@ export default function TsoPage() {
             <p className="mt-4 text-base leading-relaxed text-primary-100/80">
               TSO starts with senior secondary schools, where students, parents and the wider community expect information to be easy
               to find — and where records, results and fees have to be handled carefully.
-            </p>
-
-            <p className="mt-6 flex flex-wrap items-center gap-2 text-sm text-primary-100/85">
-              <Todo label="launch timeline" />
             </p>
           </div>
 
@@ -209,11 +190,47 @@ export default function TsoPage() {
         </div>
       </section>
 
-      <Cta
-        title="Ready to take your school online?"
-        text="Tell us about your school and what you want online first. We will walk you through what TSO can do."
-        button="Enrol your school"
-      />
+      {/* Enrol */}
+      <section id="enrol" className="container-page scroll-mt-24 py-14 sm:py-16">
+        <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
+          <div>
+            <SectionHeading
+              eyebrow="Enrol"
+              title="Enrol your school."
+              text="Tell us about your school and what you want online first. We reply within two business days."
+            />
+
+            <div className="mt-8">
+              <ContactForm
+                services={services.map(({ slug, name }) => ({ slug, name }))}
+                selectedService="web-development"
+                turnstileSiteKey={turnstileSiteKey}
+                title="TSO enrolment"
+                intro="Share your school details and what you need online. Your message goes straight to our team."
+              />
+            </div>
+          </div>
+
+          <aside className="h-fit lg:sticky lg:top-24">
+            <div className="card p-6">
+              <h2 className="text-sm font-bold uppercase tracking-wider text-ink-muted">What happens next</h2>
+              <ol className="mt-4 space-y-4 text-sm text-ink-soft">
+                {tso.steps.map((step) => (
+                  <li key={step.step} className="flex gap-3">
+                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary-50 text-xs font-bold text-primary-700 dark:bg-primary-500/10 dark:text-primary-300">
+                      {Number(step.step)}
+                    </span>
+                    <span>
+                      <span className="block font-semibold text-ink">{step.title}</span>
+                      <span className="mt-0.5 block text-ink-muted">{step.duration}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          </aside>
+        </div>
+      </section>
     </>
   );
 }
