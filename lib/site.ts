@@ -66,6 +66,14 @@ export const company = {
   secondaryTagline: 'Built in Kenya. Built to scale.',
   description:
     'Teto Technologies is a Kenyan technology company delivering custom software, mobile apps, M-Pesa integrations and network infrastructure.',
+  mission: env(
+    'TETO_MISSION',
+    'To build dependable software and network infrastructure that helps Kenyan organisations serve their customers, students and communities better.',
+  ),
+  vision: env(
+    'TETO_VISION',
+    'To be the technology partner Kenyan organisations trust to run the systems they depend on every day.',
+  ),
   email: env('TETO_EMAIL'),
   phone: env('TETO_PHONE'),
   whatsapp: env('TETO_WHATSAPP'),
@@ -309,6 +317,43 @@ export const processSteps: ProcessStep[] = [
     {step: "05", title: "Support", text: "After launch we handle fixes, monitoring and improvements under an agreed arrangement."},
 ];
 
+export type TsoFeature = { icon: IconName; title: string; text: string };
+
+/**
+ * TSO — Take Schools Online. A flagship initiative Teto is building for
+ * schools, with a focus on senior secondary schools. The wording below is a
+ * first draft for the owner to confirm; unverified specifics stay as
+ * TODO(owner) placeholders on the page.
+ */
+export const tso = {
+  name: 'TSO',
+  fullName: 'Take Schools Online',
+  status: 'In development',
+  lead: 'A flagship Teto initiative to bring senior secondary schools online — a credible web presence, digital communication with parents and students, and the systems behind admissions, records and results.',
+  why: [
+    'Parents and students look a school up online before they ever visit. A school with no website is easy to overlook.',
+    'Notices, fee reminders and results still travel by phone calls, SMS chains and paper, which is slow and easy to lose.',
+    'Schools run on records that should be searchable, backed up and safe — not scattered across exercise books and spreadsheets.',
+  ],
+  features: [
+    { icon: 'web', title: 'School website', text: 'A fast, mobile-first website that presents the school, its programmes, staff, news and contacts.' },
+    { icon: 'mail', title: 'Online admissions & enquiries', text: 'A clear enquiry and application path that reaches the right office instead of a personal phone number.' },
+    { icon: 'phone', title: 'Parent & student communication', text: 'Announcements, reminders and updates sent to parents and students instead of relying on notice boards.' },
+    { icon: 'layers', title: 'Digital student records', text: 'Student, class and staff records kept in one place, with role-based access for the people who need them.' },
+    { icon: 'check-circle', title: 'Results & reporting', text: 'Internal assessments and reports captured digitally and shared with the right people, when they need them.' },
+    { icon: 'payments', title: 'M-Pesa fee payments', text: 'Fee and activity payments collected through M-Pesa Daraja, with records reconciled against the student.' },
+  ],
+  audiences: ['Senior secondary schools', 'Boarding and day schools', 'School groups and academies'],
+} satisfies {
+  name: string;
+  fullName: string;
+  status: string;
+  lead: string;
+  why: string[];
+  features: TsoFeature[];
+  audiences: string[];
+};
+
 export const tech = [
   { name: 'Laravel', hint: 'PHP framework' },
   { name: 'Vue.js', hint: 'Frontend' },
@@ -401,6 +446,18 @@ export const products: Product[] = [
     websiteUrl: 'https://ukwelitally.teto.co.ke/',
     platforms: ['Web (PWA)'],
     status: 'Available',
+  },
+  {
+    // Owner will supply the product name, screenshot and share link.
+    name: null,
+    kind: 'app',
+    summary: "Teto's own notes and to-do list app.",
+    description: null,
+    image: null,
+    downloadUrl: null,
+    websiteUrl: null,
+    platforms: [],
+    status: 'Coming soon',
   },
 ];
 

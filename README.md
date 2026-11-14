@@ -238,10 +238,12 @@ Every item below must be supplied or approved by the site owner. Search the code
 - [ ] Approve the tagline and all service copy.
 - [x] Founder (`TETO_FOUNDER`): Rotich Elias.
 - [x] Supply the founding year (`TETO_FOUNDED`): 2019.
-- [ ] Supply the real mission statement and owner-supplied company history used on the about page.
+- [ ] Approve the mission and vision statements drafted on the about page (`TETO_MISSION`, `TETO_VISION`) and any owner-supplied company history.
+- [ ] Review the **TSO — Take Schools Online** page (`/tso`): approve the concept copy and the planned feature list, and supply the launch timeline, screenshots and any reference site. It is a first draft of a feature Teto is building, so the specifics are marked `TODO(owner)`.
 - [ ] Confirm the **problem**, **solution** and **result** copy for the four case studies on `/portfolio`. The copy is drafted from the live sites and the results are factual delivery statements (no metrics) — replace them with specific, verified outcomes when available.
 - [ ] Confirm the client names on the case studies (Bhilzak, UkweliTally, Techlup, CAFHED) are approved for publication, and that the screenshots in `public/images/work-*.png` may be used.
 - [ ] Add further product entries for `/products` if needed — UkweliTally is already listed. Each needs a name, kind, summary, description, platforms, status, image and a download or website link.
+- [ ] Name the notes and to-do list app and supply its download/share link. It is listed on `/products` as a placeholder with a `TODO(owner)` name and link.
 
 ### Contact and company details
 
@@ -289,6 +291,7 @@ app/
   layout.tsx              Root layout: fonts, nav, footer, JSON-LD
   page.tsx                Home
   about/                  About
+  tso/                    TSO — Take Schools Online flagship page
   services/               Services index and [slug] detail pages
   portfolio/              Portfolio
   products/               Products

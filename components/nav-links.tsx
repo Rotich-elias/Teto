@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, type ReactNode } from 'react';
 
 const links = [
+  { label: 'TSO', href: '/tso' },
   { label: 'Services', href: '/services' },
   { label: 'Products', href: '/products' },
   { label: 'Portfolio', href: '/portfolio' },

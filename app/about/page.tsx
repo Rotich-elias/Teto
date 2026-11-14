@@ -2,7 +2,7 @@ import { Cta } from '@/components/cta';
 import { Icon } from '@/components/icon';
 import { PageHero } from '@/components/page-hero';
 import { SectionHeading } from '@/components/section-heading';
-import { OrTodo, Todo } from '@/components/todo';
+import { OrTodo } from '@/components/todo';
 import { pageMetadata } from '@/lib/metadata';
 import { company, values } from '@/lib/site';
 
@@ -48,12 +48,25 @@ export default function AboutPage() {
               <p>We work in clear stages, document what we build and keep the scope honest.</p>
             </div>
 
-            <div className="mt-6 rounded-xl border border-dashed border-accent-600/60 bg-accent-50 p-4 text-sm text-accent-900 dark:border-accent-400/50 dark:bg-accent-500/10 dark:text-accent-200">
-              <p className="font-semibold">Owner-supplied history goes here.</p>
-              <p className="mt-1 flex flex-wrap items-center gap-2">
-                <Todo label="founding year" />
-                <Todo label="real mission statement" />
-              </p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              <div className="card p-5">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300">
+                  <Icon name="spark" className="h-5 w-5" />
+                </span>
+                <h3 className="mt-3 text-sm font-bold uppercase tracking-wider text-ink-muted">Mission</h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                  <OrTodo value={company.mission} label="mission statement" />
+                </p>
+              </div>
+              <div className="card p-5">
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-primary-50 text-primary-700 dark:bg-primary-500/10 dark:text-primary-300">
+                  <Icon name="check-circle" className="h-5 w-5" />
+                </span>
+                <h3 className="mt-3 text-sm font-bold uppercase tracking-wider text-ink-muted">Vision</h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                  <OrTodo value={company.vision} label="vision statement" />
+                </p>
+              </div>
             </div>
           </div>
 

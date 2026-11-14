@@ -1,9 +1,24 @@
 import { describe, expect, it } from 'vitest';
-import { findService, serviceName, services, telHref } from '@/lib/site';
+import { company, findService, products, serviceName, services, telHref, tso } from '@/lib/site';
 
 describe('site helpers', () => {
   it('exposes the seven configured services', () => {
     expect(services).toHaveLength(7);
+  });
+
+  it('has mission and vision statements', () => {
+    expect(company.mission?.length ?? 0).toBeGreaterThan(20);
+    expect(company.vision?.length ?? 0).toBeGreaterThan(20);
+  });
+
+  it('describes the TSO flagship with features', () => {
+    expect(tso.fullName).toBe('Take Schools Online');
+    expect(tso.features.length).toBeGreaterThan(0);
+  });
+
+  it('lists products, including the pending notes app', () => {
+    expect(products.length).toBeGreaterThanOrEqual(2);
+    expect(products.some((product) => product.name === null)).toBe(true);
   });
 
   it('finds a service by slug', () => {
