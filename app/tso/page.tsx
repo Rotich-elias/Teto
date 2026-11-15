@@ -106,7 +106,7 @@ export default function TsoPage() {
           <SectionHeading
             eyebrow="Package"
             title="One package, fully managed."
-            text="A complete, professionally built school website. The price is confirmed with each school."
+            text="A complete, professionally built school website, managed for one annual fee."
           />
 
           <div className="card mt-10 grid gap-6 p-6 sm:p-8 lg:grid-cols-[1fr_1.15fr] lg:gap-10">
@@ -140,10 +140,6 @@ export default function TsoPage() {
               ))}
             </ul>
           </div>
-
-          <p className="mt-6 flex flex-wrap items-center gap-2 text-sm text-ink-muted">
-            The package name and price are a draft — <Todo label="confirm the TSO package and price" />
-          </p>
         </div>
       </section>
 

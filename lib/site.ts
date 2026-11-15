@@ -330,9 +330,8 @@ export type TsoPlan = {
 
 /**
  * TSO — Take Schools Online. A flagship initiative Teto is building for
- * schools, with a focus on senior secondary schools. The wording below is a
- * first draft for the owner to confirm; the price stays a TODO(owner)
- * placeholder until the owner supplies it.
+ * schools, with a focus on senior secondary schools. The price is
+ * owner-confirmed; the surrounding copy is a first draft to confirm.
  */
 export const tso = {
   name: 'TSO',
@@ -360,7 +359,7 @@ export const tso = {
   plan: {
     name: 'Standard',
     tagline: 'A professionally built school website, fully managed.',
-    price: null,
+    price: 'KES 10,000',
     priceNote: 'per year, all-in',
     features: [
       'A custom-built school website',
