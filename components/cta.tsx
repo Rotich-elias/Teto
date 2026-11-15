@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AnimatedBackground } from '@/components/animated-background';
 import { Icon } from '@/components/icon';
 import { company } from '@/lib/site';
 
@@ -12,9 +13,7 @@ export function Cta({
   return (
     <section className="container-page py-16 sm:py-20">
       <div className="relative overflow-hidden rounded-4xl bg-primary-950 px-6 py-12 text-white shadow-soft sm:px-12 sm:py-16">
-        <div className="pointer-events-none absolute inset-0 opacity-20 dot-grid" />
-        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full accent-glow" />
-        <div className="pointer-events-none absolute -bottom-32 -left-16 h-80 w-80 rounded-full hero-glow" />
+        <AnimatedBackground tone="dark" mask={false} />
 
         <div className="relative flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
           <div className="max-w-2xl">

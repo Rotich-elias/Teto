@@ -1,3 +1,4 @@
+import { AnimatedBackground } from '@/components/animated-background';
 import { ContactForm } from '@/components/contact-form';
 import { Icon } from '@/components/icon';
 import { PageHero } from '@/components/page-hero';
@@ -145,8 +146,7 @@ export default function TsoPage() {
 
       {/* Focus — dark band */}
       <section className="relative overflow-hidden bg-primary-950 text-white">
-        <div className="pointer-events-none absolute inset-0 opacity-[0.18] dot-grid" />
-        <div className="pointer-events-none absolute -right-32 -top-24 h-96 w-96 rounded-full accent-glow" />
+        <AnimatedBackground tone="dark" mask={false} />
 
         <div className="container-page relative grid gap-10 py-16 sm:py-20 lg:grid-cols-[1fr_1fr] lg:gap-16">
           <div>

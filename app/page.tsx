@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AnimatedBackground } from '@/components/animated-background';
 import { HeroArt } from '@/components/hero-art';
 import { Icon } from '@/components/icon';
 import { Cta } from '@/components/cta';
@@ -22,8 +23,7 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-line/60">
-        <div className="pointer-events-none absolute inset-0 dot-grid opacity-60 [mask-image:radial-gradient(ellipse_at_top,black,transparent_72%)]" />
-        <div className="pointer-events-none absolute -left-40 top-0 h-[28rem] w-[28rem] rounded-full hero-glow blur-3xl" />
+        <AnimatedBackground tone="light" />
 
         <div className="container-page relative grid items-center gap-12 py-14 sm:py-20 lg:grid-cols-[1.04fr_0.96fr] lg:gap-10 lg:py-24">
           <div className="animate-fade-up">
@@ -137,9 +137,7 @@ export default function HomePage() {
 
       {/* Why Teto — dark band */}
       <section className="relative overflow-hidden bg-primary-950 text-white">
-        <div className="pointer-events-none absolute inset-0 opacity-[0.18] dot-grid" />
-        <div className="pointer-events-none absolute -right-32 -top-24 h-96 w-96 rounded-full accent-glow" />
-        <div className="pointer-events-none absolute -bottom-40 -left-24 h-96 w-96 rounded-full hero-glow" />
+        <AnimatedBackground tone="dark" mask={false} />
 
         <div className="container-page relative grid gap-12 py-16 sm:py-20 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16 lg:py-24">
           <div>
