@@ -478,13 +478,14 @@ export const products: Product[] = [
     status: 'Available',
   },
   {
-    // Owner will supply the screenshot and the Drive share link.
+    // Owner will supply the download/share link. The card uses the app logo;
+    // full screenshots live in public/images/deadlines-notes/.
     name: 'Deadlines & Notes',
     kind: 'app',
     summary: "Teto's own notes and to-do list app, sorted by whatever is due next.",
     description:
       'Every task is colour-coded from red when past due through orange, amber, yellow and green to blue for later, and a one-week pressure gauge shows how close the deadline is. Tasks and notes are stored on the phone first, with two local reminders per task, a home-screen widget for the next deadline, and optional background sync to your own Laravel server or your own Google Drive. No ads, analytics or crash-reporting SDKs.',
-    image: null,
+    image: '/images/deadlines-notes/deadlines-notes-logo.png',
     downloadUrl: null,
     websiteUrl: null,
     platforms: ['Android'],
