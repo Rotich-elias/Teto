@@ -94,8 +94,7 @@ export default function ProductsPage() {
                     )}
                     {!product.downloadUrl && !product.websiteUrl && (
                       <div className="flex flex-wrap items-center gap-2 text-sm">
-                        <Todo label="download link" />
-                        <Todo label="website link" />
+                        {product.kind === 'website' ? <Todo label="website link" /> : <Todo label="download link" />}
                       </div>
                     )}
                   </div>

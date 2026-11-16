@@ -244,7 +244,7 @@ Every item below must be supplied or approved by the site owner. Search the code
 - [ ] Confirm the **problem**, **solution** and **result** copy for the four case studies on `/portfolio`. The copy is drafted from the live sites and the results are factual delivery statements (no metrics) — replace them with specific, verified outcomes when available.
 - [ ] Confirm the client names on the case studies (Bhilzak, UkweliTally, Techlup, CAFHED) are approved for publication, and that the screenshots in `public/images/work-*.png` may be used.
 - [ ] Add further product entries for `/products` if needed — UkweliTally is already listed. Each needs a name, kind, summary, description, platforms, status, image and a download or website link.
-- [ ] Name the notes and to-do list app and supply its download/share link. It is listed on `/products` as a placeholder with a `TODO(owner)` name and link.
+- [ ] Supply the Deadlines & Notes screenshot and download/share link. It is listed on `/products` as a placeholder with `TODO(owner)` image and link.
 
 ### Contact and company details
 

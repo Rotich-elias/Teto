@@ -478,15 +478,16 @@ export const products: Product[] = [
     status: 'Available',
   },
   {
-    // Owner will supply the product name, screenshot and share link.
-    name: null,
+    // Owner will supply the screenshot and the Drive share link.
+    name: 'Deadlines & Notes',
     kind: 'app',
-    summary: "Teto's own notes and to-do list app.",
-    description: null,
+    summary: "Teto's own notes and to-do list app, sorted by whatever is due next.",
+    description:
+      'Every task is colour-coded from red when past due through orange, amber, yellow and green to blue for later, and a one-week pressure gauge shows how close the deadline is. Tasks and notes are stored on the phone first, with two local reminders per task, a home-screen widget for the next deadline, and optional background sync to your own Laravel server or your own Google Drive. No ads, analytics or crash-reporting SDKs.',
     image: null,
     downloadUrl: null,
     websiteUrl: null,
-    platforms: [],
+    platforms: ['Android'],
     status: 'Coming soon',
   },
 ];

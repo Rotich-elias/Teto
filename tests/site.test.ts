@@ -16,9 +16,9 @@ describe('site helpers', () => {
     expect(tso.features.length).toBeGreaterThan(0);
   });
 
-  it('lists products, including the pending notes app', () => {
+  it('lists products, including the Deadlines & Notes app', () => {
     expect(products.length).toBeGreaterThanOrEqual(2);
-    expect(products.some((product) => product.name === null)).toBe(true);
+    expect(products.some((product) => product.name === 'Deadlines & Notes')).toBe(true);
   });
 
   it('finds a service by slug', () => {
