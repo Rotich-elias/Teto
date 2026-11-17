@@ -29,7 +29,7 @@ export default function PortfolioPage() {
               <div className="relative min-h-64 overflow-hidden bg-surface-sunken">
                 <Image
                   src={project.image}
-                  alt="Abstract placeholder artwork for an unconfirmed case study"
+                  alt={`Screenshot of ${project.title ?? 'a Teto case study'}`}
                   width={1200}
                   height={750}
                   className="h-full w-full object-cover"

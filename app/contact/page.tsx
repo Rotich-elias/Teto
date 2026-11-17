@@ -173,7 +173,7 @@ export default async function ContactPage({
                 <iframe
                   src={company.mapEmbedUrl}
                   title={`Map showing the ${company.name} location`}
-                  className="h-64 w-full border-0"
+                  className="aspect-video h-auto w-full border-0"
                   loading="lazy"
                   referrerPolicy="no-referrer-when-downgrade"
                   allowFullScreen

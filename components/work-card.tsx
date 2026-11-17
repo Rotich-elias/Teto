@@ -10,7 +10,7 @@ export function WorkCard({ project, index }: { project: Project; index: number }
       <div className="relative aspect-[16/10] overflow-hidden bg-surface-sunken">
         <Image
           src={project.image}
-          alt="Abstract placeholder artwork for an unconfirmed case study"
+          alt={`Screenshot of ${project.title ?? 'a Teto case study'}`}
           width={1200}
           height={750}
           className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"

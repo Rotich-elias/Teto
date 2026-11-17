@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { company, findService, products, serviceName, services, telHref, tso } from '@/lib/site';
 
 describe('site helpers', () => {
@@ -41,4 +41,16 @@ describe('site helpers', () => {
   it('builds a tel: link without spaces', () => {
     expect(telHref('+254 712 345 678')).toBe('tel:+254712345678');
   });
+
+  it('builds the WhatsApp link with the owner number', async () => {
+    vi.stubEnv('TETO_WHATSAPP', '254721237811');
+    vi.stubEnv('TETO_WHATSAPP_MESSAGE', 'Hello Teto Technologies');
+    vi.resetModules();
+    const { whatsappHref } = await import('@/lib/site');
+    expect(whatsappHref()).toBe('https://wa.me/254721237811?text=Hello%20Teto%20Technologies');
+  });
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
 });

@@ -25,6 +25,16 @@ export function contactMailConfigured(): boolean {
   return Boolean(process.env.RESEND_API_KEY);
 }
 
+/** Notification inboxes. CONTACT_TO_EMAIL accepts a comma-separated list. */
+export function notificationRecipients(): string[] {
+  const configured = process.env.CONTACT_TO_EMAIL || company.email;
+  if (!configured) return [];
+  return configured
+    .split(',')
+    .map((address) => address.trim())
+    .filter(Boolean);
+}
+
 /** Send the company notification and the visitor auto-reply. */
 export async function sendContactEmails(data: ContactData, serviceName: string): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
@@ -35,14 +45,14 @@ export async function sendContactEmails(data: ContactData, serviceName: string):
 
   const resend = new Resend(apiKey);
   const from = process.env.CONTACT_FROM_EMAIL || FROM_FALLBACK;
-  const inbox = process.env.CONTACT_TO_EMAIL || company.email;
+  const inboxes = notificationRecipients();
 
-  if (!inbox) {
+  if (inboxes.length === 0) {
     console.warn('Contact notification not sent: no CONTACT_TO_EMAIL or TETO_EMAIL configured.');
   } else {
     await resend.emails.send({
       from,
-      to: inbox,
+      to: inboxes,
       replyTo: data.email,
       subject: `New enquiry: ${serviceName} — ${data.name}`,
       html: `
@@ -60,7 +70,7 @@ export async function sendContactEmails(data: ContactData, serviceName: string):
   await resend.emails.send({
     from,
     to: data.email,
-    replyTo: inbox || undefined,
+    replyTo: inboxes[0],
     subject: `We received your message — ${company.name}`,
     html: `
       <p>Hi ${escapeHtml(data.name)},</p>

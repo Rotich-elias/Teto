@@ -138,7 +138,7 @@ will not show it again.
 | Variable | Value |
 | --- | --- |
 | `RESEND_API_KEY` | the key from 2.2 |
-| `CONTACT_TO_EMAIL` | inbox that receives enquiries (falls back to `TETO_EMAIL`) |
+| `CONTACT_TO_EMAIL` | comma-separated inboxes that receive enquiries: `tetoteknologies@gmail.com, elgeiy8@gmail.com` (falls back to `TETO_EMAIL`) |
 | `CONTACT_FROM_EMAIL` | a verified sender, e.g. `Teto Technologies <no-reply@teto.co.ke>` |
 
 The local development default `Teto Technologies <onboarding@resend.dev>` will
@@ -168,6 +168,10 @@ abuse.
 
 ## 4. Hosting — Vercel
 
+The site is hosted on Vercel. The production origin is `https://teto.co.ke`.
+Vercel issues and renews the TLS certificate automatically; DNS is managed in
+Cloudflare in **DNS only** mode (no Cloudflare proxy).
+
 ### 4.1 Import the project
 
 1. Sign in at <https://vercel.com> and **Add New → Project**.
@@ -188,18 +192,23 @@ repo.
 | `NEXT_PUBLIC_SITE_URL` | `https://teto.co.ke` — used for canonical URLs, sitemap, robots, JSON-LD |
 | `DATABASE_URL` | Neon pooled connection string (step 1) |
 | `RESEND_API_KEY` | Resend key (step 2) |
-| `CONTACT_TO_EMAIL` | e.g. `tetoteknologies@gmail.com` |
+| `CONTACT_TO_EMAIL` | `tetoteknologies@gmail.com, elgeiy8@gmail.com` |
 | `CONTACT_FROM_EMAIL` | verified sender, e.g. `Teto Technologies <no-reply@teto.co.ke>` |
 
-**Company details** — blank values render a visible `TODO(owner)` badge, so fill
-in as many as you have:
+**Company details** — blank values render a visible `TODO(owner)` badge (except
+the social URLs, which simply hide their icons), so fill in as many as you have:
 
 ```text
-TETO_EMAIL, TETO_PHONE, TETO_WHATSAPP, TETO_WHATSAPP_MESSAGE,
+TETO_EMAIL, TETO_DATA_EMAIL, TETO_PHONE, TETO_WHATSAPP, TETO_WHATSAPP_MESSAGE,
 TETO_ADDRESS, TETO_HOURS, TETO_FOUNDED, TETO_LEGAL_NAME, TETO_REG_NUMBER,
-TETO_FOUNDER, TETO_MAP_EMBED_URL,
-TETO_LINKEDIN, TETO_GITHUB, TETO_X, TETO_FACEBOOK, TETO_INSTAGRAM, TETO_TIKTOK
+TETO_FOUNDER, TETO_MAP_EMBED_URL, TETO_TIKTOK
 ```
+
+`TETO_TIKTOK` is set to `https://www.tiktok.com/@teto_technologies`.
+`TETO_LINKEDIN`, `TETO_GITHUB`, `TETO_X`, `TETO_FACEBOOK` and `TETO_INSTAGRAM`
+are intentionally left blank: blank social URLs hide the icons instead of
+rendering a `TODO(owner)` badge. Supply them when the owner approves the profile
+links.
 
 **Optional**
 
@@ -223,15 +232,21 @@ Deploy. Vercel runs `next build`; the pages are prerendered at build time.
 
 ## 5. Domain and TLS
 
+The production domain is `teto.co.ke`. DNS is managed in Cloudflare in **DNS
+only** mode (grey cloud), so Cloudflare does not proxy or cache the site. TLS is
+issued and renewed by Vercel — there is no certificate to upload or renew
+manually.
+
 1. In Vercel, **Project → Settings → Domains**, add `teto.co.ke` and
    `www.teto.co.ke`.
 2. Vercel shows the DNS records to create (an `A` record to `76.76.21.21`, or a
    `CNAME` to `cname.vercel-dns.com` — follow what the dashboard says for your
    apex domain).
-3. At your DNS provider, add those records. Set `www` to redirect to the apex,
-   or the apex to `www` — pick one canonical host and be consistent.
-4. Vercel issues the TLS certificate automatically once DNS resolves. Confirm
-   `https://teto.co.ke` loads and HTTP redirects to HTTPS.
+3. In Cloudflare DNS, add those records with **Proxy status: DNS only**. Pick one
+   canonical host and redirect the other to it (this site uses the apex,
+   `https://teto.co.ke`).
+4. Confirm Vercel issues the certificate: `https://teto.co.ke` loads and HTTP
+   redirects to HTTPS.
 5. Set `NEXT_PUBLIC_SITE_URL=https://teto.co.ke` (matching the canonical host)
    and redeploy.
 
@@ -239,7 +254,7 @@ Deploy. Vercel runs `next build`; the pages are prerendered at build time.
 
 ## 6. Post-deploy smoke test
 
-Run these against the live site. Replace the domain as needed.
+Run these against the live site at `https://teto.co.ke`.
 
 ```bash
 # 1. Home and contact render
@@ -266,8 +281,9 @@ curl -s -o /dev/null -w "robots=%{http_code}\n"  https://teto.co.ke/robots.txt
 
 Then confirm:
 
-- [ ] The test enquiry from step 3/4 arrives in `CONTACT_TO_EMAIL`, and the
-      sender address receives the auto-reply.
+- [ ] The test enquiry from step 3/4 arrives in **both** notification inboxes
+      (`tetoteknologies@gmail.com` and `elgeiy8@gmail.com`), and the sender
+      address receives the auto-reply.
 - [ ] The row exists in the database:
       `SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 1;`
 - [ ] `/contact?status=sent` shows the green banner and `/contact?status=invalid`
@@ -322,7 +338,9 @@ a database change.
 - [ ] `DATABASE_URL` set and `contact_messages` exists in production.
 - [ ] `RESEND_API_KEY` set and `CONTACT_FROM_EMAIL` uses a verified domain.
 - [ ] `NEXT_PUBLIC_SITE_URL` set to the canonical HTTPS origin.
-- [ ] All `TETO_*` company details filled in; no `TODO(owner)` badges remain.
+- [ ] All required `TETO_*` company details filled in; the remaining social
+      URLs (apart from TikTok) are intentionally blank and their icons hidden;
+      no other `TODO(owner)` badges remain.
 - [ ] Portfolio placeholders replaced with owner-approved content.
 - [ ] Domain resolves over HTTPS; HTTP redirects to HTTPS.
 - [ ] Post-deploy smoke test (section 6) passes end-to-end.

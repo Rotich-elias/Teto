@@ -31,7 +31,7 @@ export default function PrivacyPage() {
 
           <h1 className="mt-6 text-4xl font-extrabold leading-tight sm:text-5xl">Privacy Policy</h1>
           <p className="mt-4 text-sm text-ink-muted">
-            Last updated: <Todo label="policy effective date" />
+            Last updated: 1 November 2026
           </p>
         </div>
       </section>
@@ -42,8 +42,8 @@ export default function PrivacyPage() {
             <div className="rounded-xl border border-dashed border-accent-600/60 bg-accent-50 p-4 text-sm text-accent-900 dark:border-accent-400/50 dark:bg-accent-500/10 dark:text-accent-200">
               <p className="font-semibold">Draft for legal review.</p>
               <p className="mt-1">
-                This policy is a starting point. The owner should confirm retention periods, the data-request contact and have it
-                reviewed by a qualified Kenyan lawyer.
+                This policy is a starting point. The owner should confirm retention periods and have it reviewed by a qualified
+                Kenyan lawyer.
               </p>
             </div>
 
@@ -153,7 +153,11 @@ export default function PrivacyPage() {
             <h2 id="contact">Contact</h2>
             <p>
               For privacy questions or data requests:{' '}
-              {company.email ? <a href={`mailto:${company.email}`}>{company.email}</a> : <Todo label="data protection contact email" />}
+              {company.dataEmail ? (
+                <a href={`mailto:${company.dataEmail}`}>{company.dataEmail}</a>
+              ) : (
+                <Todo label="data protection contact email" />
+              )}
             </p>
             <p>
               Postal address: <OrTodo value={company.address} label="physical address" />

@@ -75,6 +75,7 @@ export const company = {
     'To be the technology partner Kenyan organisations trust to run the systems they depend on every day.',
   ),
   email: env('TETO_EMAIL'),
+  dataEmail: env('TETO_DATA_EMAIL') || env('TETO_EMAIL'),
   phone: env('TETO_PHONE'),
   whatsapp: env('TETO_WHATSAPP'),
   whatsappMessage: env('TETO_WHATSAPP_MESSAGE', 'Hello Teto Technologies, I would like to discuss a project.')!,

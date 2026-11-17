@@ -85,6 +85,7 @@ All company details are read through `lib/site.ts`, so they can be changed witho
 | Variable | Where it appears |
 | --- | --- |
 | `TETO_EMAIL` | Footer, contact page, email links |
+| `TETO_DATA_EMAIL` | Privacy policy data-request contact (falls back to `TETO_EMAIL`) |
 | `TETO_PHONE` | Footer, contact page, mobile nav |
 | `TETO_WHATSAPP` | Floating WhatsApp button (international format, digits only) |
 | `TETO_WHATSAPP_MESSAGE` | Pre-filled WhatsApp message |
@@ -97,14 +98,14 @@ All company details are read through `lib/site.ts`, so they can be changed witho
 | `TETO_MAP_EMBED_URL` | Contact page map iframe |
 | `TETO_LINKEDIN`, `TETO_GITHUB`, `TETO_X`, `TETO_FACEBOOK`, `TETO_INSTAGRAM`, `TETO_TIKTOK` | Footer social links |
 
-Blank values render a visible `TODO(owner)` badge instead of inventing information. Pages are prerendered, so redeploy after changing a variable.
+Blank values render a visible `TODO(owner)` badge instead of inventing information; blank social URLs simply hide the social icons. Pages are prerendered, so redeploy after changing a variable.
 
 ### Contact form email (Resend)
 
 | Variable | Purpose |
 | --- | --- |
 | `RESEND_API_KEY` | Resend API key. Without it, no email is sent. |
-| `CONTACT_TO_EMAIL` | Inbox that receives notifications. Falls back to `TETO_EMAIL`. |
+| `CONTACT_TO_EMAIL` | Comma-separated notification inboxes: `tetoteknologies@gmail.com, elgeiy8@gmail.com`. Falls back to `TETO_EMAIL`. |
 | `CONTACT_FROM_EMAIL` | Verified sender. Falls back to Resend's onboarding address. |
 
 ### Contact form storage (Neon Postgres)
@@ -131,7 +132,7 @@ The honeypot and rate limit work without Turnstile.
 2. `lib/contact.ts` validates the fields and rejects honeypot submissions.
 3. If Turnstile is enabled, the token is verified server-side (`lib/turnstile.ts`).
 4. The enquiry is stored in `contact_messages` **before** email is attempted.
-5. The company notification is sent to `CONTACT_TO_EMAIL`; the sender receives an auto-reply.
+5. The company notification is sent to every address in `CONTACT_TO_EMAIL`; the sender receives an auto-reply.
 6. Storage and mail failures are logged and do not lose the enquiry or surface as an error.
 
 The endpoint accepts both a JSON body (the React form) and a `application/x-www-form-urlencoded` body (the no-JavaScript fallback). JSON requests receive `201`/`400`/`422`/`429` JSON responses; form posts receive a `303` redirect to `/contact?status=sent|invalid|rate|verify#enquiry`, which the contact page renders as a banner.
@@ -206,25 +207,25 @@ npm run build
 
 1. Import the repository into Vercel and set the framework preset to **Next.js**.
 2. Add the environment variables from `.env.example` in **Project → Settings → Environment Variables**.
-3. Set `NEXT_PUBLIC_SITE_URL` to the production origin (e.g. `https://teto.co.ke`).
+3. Set `NEXT_PUBLIC_SITE_URL` to the production origin: `https://teto.co.ke`. Vercel issues and renews TLS automatically; DNS is managed in Cloudflare (DNS only).
 4. Run `npm run db:migrate` once against the production `DATABASE_URL`.
 5. Deploy. Pages are prerendered at build time, so redeploy after changing any `TETO_*` variable.
 
 ### Deployment checklist
 
-- [ ] Point the domain’s A/AAAA records at the host; point `www` at the apex or a redirect.
-- [ ] Issue a TLS certificate and redirect HTTP to HTTPS.
-- [ ] Set `NEXT_PUBLIC_SITE_URL` to the production origin.
+- [ ] Hosting is **Vercel**; production origin is `https://teto.co.ke` (TLS is issued and renewed automatically by Vercel).
+- [ ] DNS is managed in **Cloudflare (DNS only)**; point the domain's records at Vercel as shown in the Vercel dashboard.
+- [ ] TLS is handled by Vercel; confirm `https://teto.co.ke` loads and HTTP redirects to HTTPS. Set `NEXT_PUBLIC_SITE_URL=https://teto.co.ke`.
 - [ ] Set `DATABASE_URL` and run `npm run db:migrate`; confirm the `contact_messages` table exists.
 - [ ] Set `RESEND_API_KEY`, `CONTACT_TO_EMAIL` and a verified `CONTACT_FROM_EMAIL`, then send a test enquiry end-to-end.
-- [ ] Fill in all `TETO_*` company details.
+- [ ] Fill in all required `TETO_*` company details; the remaining social URLs (apart from TikTok) are intentionally blank for now.
 - [ ] Confirm the case-study copy and replace the delivery statements with verified results.
 - [ ] Confirm the security headers in `next.config.ts` match the production domain (and the CSP once Turnstile/Maps are configured).
 - [ ] Configure database backups, and test a restore.
 - [ ] Configure uptime and error monitoring.
 - [ ] Review the privacy policy and terms with a qualified adviser.
 - [ ] Run Lighthouse mobile on `/` and `/contact` and confirm scores of at least 90.
-- [ ] Submit `https://your-domain/sitemap.xml` in Google Search Console.
+- [x] Submit `https://teto.co.ke/sitemap.xml` in Google Search Console.
 
 ---
 
@@ -249,32 +250,32 @@ Every item below must be supplied or approved by the site owner. Search the code
 ### Contact and company details
 
 - [x] Company email address (`TETO_EMAIL`): tetoteknologies@gmail.com.
-- [ ] Phone number (`TETO_PHONE`).
-- [ ] WhatsApp number in international format without `+` (`TETO_WHATSAPP`).
-- [ ] Physical address (`TETO_ADDRESS`).
-- [ ] Business hours (`TETO_HOURS`).
-- [ ] Google Maps embed URL (`TETO_MAP_EMBED_URL`).
-- [ ] Social links: LinkedIn, GitHub, X, Facebook, Instagram.
+- [x] Phone number (`TETO_PHONE`): 0721 237 811.
+- [x] WhatsApp number in international format without `+` (`TETO_WHATSAPP`): 254721237811.
+- [x] Physical address (`TETO_ADDRESS`): Westlands, Nairobi, Kenya.
+- [x] Business hours (`TETO_HOURS`): Open 24/7.
+- [x] Google Maps embed URL (`TETO_MAP_EMBED_URL`): `https://www.google.com/maps?q=Westlands,+Nairobi,+Kenya&output=embed`.
+- [ ] Social links: TikTok supplied (`https://www.tiktok.com/@teto_technologies`); LinkedIn, GitHub, X, Facebook and Instagram still blank, so their icons are hidden rather than showing a badge.
 - [x] Registered business name (`TETO_LEGAL_NAME`): Teto Technologies.
 - [x] Business registration number (`TETO_REG_NUMBER`): Tech20261.
-- [ ] Data protection contact email for privacy requests.
+- [x] Data protection contact email for privacy requests (`TETO_DATA_EMAIL`): tetoteknologies@gmail.com.
 
 ### Email and infrastructure
 
 - [ ] Resend API key and a verified sending domain (`RESEND_API_KEY`, `CONTACT_FROM_EMAIL`).
-- [x] Notification inbox (`CONTACT_TO_EMAIL`): tetoteknologies@gmail.com.
+- [x] Notification inboxes (`CONTACT_TO_EMAIL`): tetoteknologies@gmail.com and elgeiy8@gmail.com.
 - [ ] Neon (or other Postgres) database and its `DATABASE_URL`.
-- [ ] Hosting/VPS provider and region.
-- [ ] Domain registrar and DNS access.
-- [ ] TLS certificate/renewal method.
+- [ ] Hosting: Vercel. Region not yet specified.
+- [ ] Domain DNS is managed in Cloudflare (DNS only); registrar not yet specified. Production URL: `https://teto.co.ke`.
+- [ ] TLS is issued and renewed automatically by Vercel; confirm the production HTTPS redirect after deploy.
 - [ ] Backup destination, retention, and restore procedure.
 - [ ] Monitoring and alerting destination.
 - [ ] Optional Cloudflare Turnstile site and secret keys.
 
 ### Legal
 
-- [ ] Privacy policy effective date.
-- [ ] Terms of use effective date.
+- [x] Privacy policy effective date: 1 November 2026.
+- [x] Terms of use effective date: 1 November 2026.
 - [ ] Confirmed data retention period for contact enquiries.
 - [ ] Legal review of the privacy policy, terms, and consent wording.
 - [ ] Confirm whether any analytics, advertising, or other non-essential cookies will be added. If you enable Turnstile or add analytics, review whether a cookie notice is required.

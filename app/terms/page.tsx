@@ -19,7 +19,7 @@ export default function TermsPage() {
 
           <h1 className="mt-6 text-4xl font-extrabold leading-tight sm:text-5xl">Terms of Use</h1>
           <p className="mt-4 text-sm text-ink-muted">
-            Last updated: <Todo label="terms effective date" />
+            Last updated: 1 November 2026
           </p>
         </div>
       </section>

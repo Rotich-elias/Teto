@@ -39,9 +39,10 @@ export function Footer() {
               {company.secondaryTagline}
             </p>
 
-            <div className="mt-5 flex items-center gap-2">
-              {socialLinks.length > 0 ? (
-                socialLinks.map((item) => (
+            {/* Social icons are hidden entirely while their URLs are blank. */}
+            {socialLinks.length > 0 ? (
+              <div className="mt-5 flex items-center gap-2">
+                {socialLinks.map((item) => (
                   <a
                     key={item.name}
                     href={item.url!}
@@ -52,11 +53,9 @@ export function Footer() {
                   >
                     <Icon name={item.icon} className="h-4 w-4" />
                   </a>
-                ))
-              ) : (
-                <Todo label="social media links" />
-              )}
-            </div>
+                ))}
+              </div>
+            ) : null}
           </div>
 
           <nav aria-label="Services">
