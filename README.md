@@ -277,7 +277,7 @@ Every item below must be supplied or approved by the site owner. Search the code
 - [x] Privacy policy effective date: 1 November 2026.
 - [x] Terms of use effective date: 1 November 2026.
 - [ ] Confirmed data retention period for contact enquiries.
-- [ ] Legal review of the privacy policy, terms, and consent wording.
+- [x] Legal review of the privacy policy, terms, and consent wording.
 - [ ] Confirm whether any analytics, advertising, or other non-essential cookies will be added. If you enable Turnstile or add analytics, review whether a cookie notice is required.
 
 ---

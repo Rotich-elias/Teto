@@ -26,13 +26,6 @@ export default function TermsPage() {
 
       <section className="container-page py-12 sm:py-16">
         <div className="prose-teto mx-auto max-w-3xl">
-          <div className="mb-8 rounded-xl border border-dashed border-accent-600/60 bg-accent-50 p-4 text-sm text-accent-900 dark:border-accent-400/50 dark:bg-accent-500/10 dark:text-accent-200">
-            <p className="font-semibold">Draft for legal review.</p>
-            <p className="mt-1">
-              These are basic website terms, not a client contract. The owner should have them reviewed before launch.
-            </p>
-          </div>
-
           <p>
             These terms apply to your use of <Link href="/">teto.co.ke</Link>, operated by {company.name}. By using the site, you
             agree to them. If you do not agree, please do not use the site.

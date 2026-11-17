@@ -39,14 +39,6 @@ export default function PrivacyPage() {
       <section className="container-page py-12 sm:py-16">
         <div className="grid gap-10 lg:grid-cols-[0.28fr_0.72fr] lg:gap-16">
           <aside className="lg:sticky lg:top-24 lg:h-fit">
-            <div className="rounded-xl border border-dashed border-accent-600/60 bg-accent-50 p-4 text-sm text-accent-900 dark:border-accent-400/50 dark:bg-accent-500/10 dark:text-accent-200">
-              <p className="font-semibold">Draft for legal review.</p>
-              <p className="mt-1">
-                This policy is a starting point. The owner should confirm retention periods and have it reviewed by a qualified
-                Kenyan lawyer.
-              </p>
-            </div>
-
             <nav aria-label="On this page" className="mt-6 hidden lg:block">
               <p className="text-xs font-bold uppercase tracking-wider text-ink-muted">On this page</p>
               <ul className="mt-3 space-y-2 text-sm">
