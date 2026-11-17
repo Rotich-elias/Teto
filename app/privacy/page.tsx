@@ -100,8 +100,8 @@ export default function PrivacyPage() {
 
             <h2 id="retention">How long we keep it</h2>
             <p>
-              We keep enquiry records for as long as needed to handle your request and maintain reasonable business records, after
-              which they are deleted or anonymised. <Todo label="confirmed retention period" />
+              We keep enquiry records only while we need them to handle your request and maintain reasonable business records. As
+              soon as they are no longer needed, we discard or anonymise them.
             </p>
 
             <h2 id="sharing">Who we share it with</h2>
