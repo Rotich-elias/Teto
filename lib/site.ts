@@ -48,6 +48,7 @@ export type Project = {
 
 export type Product = {
   name: string | null;
+  slug: string | null; // stable key for /download/<slug> and the admin upload form
   kind: 'app' | 'website';
   summary: string | null;
   description: string | null;
@@ -464,10 +465,15 @@ export const portfolio: Project[] = [
  * Products — apps for download and website links. Add entries with verified
  * names, descriptions and URLs. Leave fields null/empty to show a
  * TODO(owner) placeholder.
+ *
+ * For an app, set `slug` and point `downloadUrl` at `/download/<slug>`. The
+ * admin area at /admin/downloads uploads the APK and stores its URL in the
+ * database; the redirect route resolves the current file at request time.
  */
 export const products: Product[] = [
   {
     name: 'UkweliTally',
+    slug: 'ukwelitally',
     kind: 'app',
     summary: 'Independent election results tallying for candidates, agents and observers.',
     description:
@@ -479,15 +485,17 @@ export const products: Product[] = [
     status: 'Available',
   },
   {
-    // Shared via Google Drive. The card uses the app logo; full screenshots
-    // live in public/images/deadlines-notes/.
+    // The APK is uploaded from /admin/downloads and served from Vercel Blob.
+    // The card uses the app logo; full screenshots live in
+    // public/images/deadlines-notes/.
     name: 'Deadlines & Notes',
+    slug: 'deadlines-notes',
     kind: 'app',
     summary: "Teto's own notes and to-do list app, sorted by whatever is due next.",
     description:
       'Every task is colour-coded from red when past due through orange, amber, yellow and green to blue for later, and a one-week pressure gauge shows how close the deadline is. Tasks and notes are stored on the phone first, with two local reminders per task, a home-screen widget for the next deadline, and optional background sync to your own Laravel server or your own Google Drive. No ads, analytics or crash-reporting SDKs.',
     image: '/images/deadlines-notes/deadlines-notes-logo.png',
-    downloadUrl: 'https://drive.google.com/file/d/1NzZTAO76FZVA81uOq_vmEMvMVoyYp9s3/view?usp=sharing',
+    downloadUrl: '/download/deadlines-notes',
     websiteUrl: null,
     platforms: ['Android'],
     status: 'Available',

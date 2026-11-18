@@ -15,6 +15,11 @@ function getClient(): NeonQueryFunction<false, false> {
   return client;
 }
 
+/** Shared client for every table in the Neon database. */
+export function getSql(): NeonQueryFunction<false, false> {
+  return getClient();
+}
+
 export type ContactMessageMeta = {
   ip: string;
   userAgent: string;

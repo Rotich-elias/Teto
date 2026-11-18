@@ -81,7 +81,13 @@ export default function ProductsPage() {
 
                   <div className="mt-auto flex flex-wrap gap-3 border-t border-line pt-4">
                     {product.downloadUrl && (
-                      <a href={product.downloadUrl} target="_blank" rel="noopener noreferrer" className="btn-primary text-sm">
+                      <a
+                        href={product.downloadUrl}
+                        {...(product.downloadUrl.startsWith('/')
+                          ? {}
+                          : { target: '_blank', rel: 'noopener noreferrer' })}
+                        className="btn-primary text-sm"
+                      >
                         Download
                         <Icon name="download" className="h-4 w-4" />
                       </a>

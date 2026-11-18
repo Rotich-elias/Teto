@@ -110,6 +110,22 @@ Expect `[{ n: 0 }]`. (Or use the Neon SQL editor: `SELECT count(*) FROM contact_
 
 **Keep this connection string secret.** It grants read/write to the database.
 
+### 1.5 App downloads — Vercel Blob
+
+The APK linked from `/products` is served from Vercel Blob, with its metadata in the same Neon database. The admin page at `/admin/downloads` uploads files directly from the browser, so large APKs are not limited by Vercel's 4.5 MB function payload cap.
+
+1. In Vercel, open the project's **Storage** tab → **Create Storage** → **Blob**. Choose **Public** access, name it (for example `app-downloads`), select **Add a read-write token env var to this connection**, and connect it to Production, Preview and Development. The read-write token is required to issue browser upload tokens.
+2. Locally, run `vercel env pull` so `.env.local` receives `BLOB_READ_WRITE_TOKEN` (and the OIDC variables Vercel adds).
+3. Generate the admin credentials and set them in Vercel and `.env.local`:
+   ```bash
+   openssl rand -hex 32   # use as ADMIN_SESSION_SECRET
+   ```
+   `ADMIN_PASSWORD` is the password you will use at `/admin/login`. Keep both secret.
+4. Run `npm run db:migrate` again — it also creates the `app_downloads` table.
+5. After deploying, sign in at `https://teto.co.ke/admin/downloads` and upload `deadline-1.0.24.apk` for the **Deadlines & Notes** product. Then confirm `/download/deadlines-notes` redirects and saves the APK.
+
+Uploading a replacement on the admin page updates the public download immediately; no code change or redeploy is needed.
+
 ---
 
 ## 2. Email — Resend
@@ -194,6 +210,10 @@ repo.
 | `RESEND_API_KEY` | Resend key (step 2) |
 | `CONTACT_TO_EMAIL` | `tetoteknologies@gmail.com, elgeiy8@gmail.com` |
 | `CONTACT_FROM_EMAIL` | verified sender, e.g. `Teto Technologies <no-reply@teto.co.ke>` |
+| `ADMIN_PASSWORD` | Password for `/admin/downloads` (step 1.5) |
+| `ADMIN_SESSION_SECRET` | `openssl rand -hex 32` (step 1.5) |
+
+Vercel adds `BLOB_READ_WRITE_TOKEN`, `BLOB_STORE_ID` and `VERCEL_OIDC_TOKEN` automatically when the Blob store is connected (step 1.5). No manual entry is needed for those.
 
 **Company details** — blank values render a visible `TODO(owner)` badge (except
 the social URLs, which simply hide their icons), so fill in as many as you have:
@@ -277,6 +297,9 @@ curl -s -o /dev/null -w "form=%{http_code} %{redirect_url}\n" -X POST https://te
 # 5. Sitemap and robots
 curl -s -o /dev/null -w "sitemap=%{http_code}\n" https://teto.co.ke/sitemap.xml
 curl -s -o /dev/null -w "robots=%{http_code}\n"  https://teto.co.ke/robots.txt
+
+# 6. App download (expect 302 to a *.public.blob.vercel-storage.com URL)
+curl -s -o /dev/null -w "download=%{http_code} %{redirect_url}\n" https://teto.co.ke/download/deadlines-notes
 ```
 
 Then confirm:
@@ -329,6 +352,10 @@ a database change.
 | Map shows a placeholder | `TETO_MAP_EMBED_URL` is blank; set it and redeploy. |
 | Company details not updating | `TETO_*` values are baked in at build time — redeploy after changing them. |
 | CSP blocks Turnstile or Maps | Ensure the feature is enabled (`TURNSTILE_ENABLED=true` / `TETO_MAP_EMBED_URL` set) and redeploy so `next.config.ts` includes the origins. |
+| Admin login says "not configured" | Set `ADMIN_PASSWORD` and `ADMIN_SESSION_SECRET` in Vercel, then redeploy. |
+| Upload fails with a CSP error | Redeploy after connecting the Blob store — `next.config.ts` allows the Blob origins in `connect-src`. |
+| Upload is rejected as "unexpected upload location" | The Blob store must be public and the file must land under `downloads/<slug>/`. Re-upload from `/admin/downloads`. |
+| `/download/<slug>` redirects to `/products` | No active row in `app_downloads`. Run `npm run db:migrate` and upload the APK from the admin page. |
 
 ---
 
@@ -336,6 +363,8 @@ a database change.
 
 - [ ] `npm run typecheck`, `npm run test` and `npm run build` pass.
 - [ ] `DATABASE_URL` set and `contact_messages` exists in production.
+- [ ] Blob store connected, `app_downloads` table created, and `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET` set (step 1.5).
+- [ ] APK uploaded from `/admin/downloads` and `/download/deadlines-notes` saves the file.
 - [ ] `RESEND_API_KEY` set and `CONTACT_FROM_EMAIL` uses a verified domain.
 - [ ] `NEXT_PUBLIC_SITE_URL` set to the canonical HTTPS origin.
 - [ ] All required `TETO_*` company details filled in; the remaining social

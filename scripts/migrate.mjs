@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Creates the contact_messages table. Safe to run repeatedly.
+ * Creates the contact_messages and app_downloads tables. Safe to run repeatedly.
  *
  *   npm run db:migrate
  *
@@ -45,6 +45,21 @@ const statements = [
     name: 'index contact_messages by created_at',
     query: `CREATE INDEX IF NOT EXISTS contact_messages_created_at_idx
       ON contact_messages (created_at DESC)`,
+  },
+  {
+    name: 'create app_downloads table',
+    query: `CREATE TABLE IF NOT EXISTS app_downloads (
+      id BIGSERIAL PRIMARY KEY,
+      product_slug TEXT NOT NULL UNIQUE,
+      file_name TEXT NOT NULL,
+      version TEXT,
+      size_bytes BIGINT NOT NULL,
+      content_type TEXT NOT NULL,
+      blob_url TEXT NOT NULL,
+      download_url TEXT NOT NULL,
+      blob_pathname TEXT NOT NULL,
+      uploaded_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`,
   },
 ];
 

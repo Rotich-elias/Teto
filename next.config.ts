@@ -12,7 +12,13 @@ const hasMapEmbed = Boolean(process.env.TETO_MAP_EMBED_URL);
  */
 function contentSecurityPolicy(): string {
   const scripts = ["'self'", "'unsafe-inline'"];
-  const connects = ["'self'"];
+  const connects = [
+    "'self'",
+    // The admin page uploads APKs directly from the browser to Vercel Blob.
+    'https://blob.vercel-storage.com',
+    'https://*.public.blob.vercel-storage.com',
+    'https://*.private.blob.vercel-storage.com',
+  ];
   const frames: string[] = [];
 
   if (!isProd) {

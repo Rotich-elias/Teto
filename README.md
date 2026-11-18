@@ -18,6 +18,7 @@ Marketing website for **Teto Technologies** (teto.co.ke), a Kenyan technology co
   - best-effort rate limit of 5 submissions per hour per IP, shared across serverless instances via the database when one is configured;
   - optional Cloudflare Turnstile;
   - AJAX success/error states, plus a no-JavaScript POST fallback that redirects back to `/contact?status=…`.
+- Admin area at `/admin/downloads` for uploading and replacing app APKs. Files are stored in Vercel Blob, metadata in Neon Postgres, and visitors download from stable `/download/<slug>` links — no Google Drive and no redeploy needed for a new version.
 - Floating WhatsApp button driven by `TETO_WHATSAPP`.
 - Every “Get a Quote” link points to `/contact?service=<slug>` and preselects the service.
 - SEO: unique titles and descriptions, canonical URLs, Open Graph/Twitter metadata, JSON-LD, `sitemap.xml`, and `robots.txt`.
@@ -34,6 +35,7 @@ Marketing website for **Teto Technologies** (teto.co.ke), a Kenyan technology co
 | Language | TypeScript |
 | Styling | Tailwind CSS 3 |
 | Database | Neon serverless Postgres (`@neondatabase/serverless`) |
+| File storage | Vercel Blob (`@vercel/blob`) for app downloads |
 | Mail | [Resend](https://resend.com) |
 | Tests | Vitest (`tests/`) |
 | Deployment | Vercel (or any Node 20+ host) |
@@ -114,6 +116,15 @@ Blank values render a visible `TODO(owner)` badge instead of inventing informati
 | --- | --- |
 | `DATABASE_URL` | Postgres connection string. Without it, submissions are emailed but not stored. |
 
+### App downloads (admin + Vercel Blob)
+
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | Same Neon database; also stores the `app_downloads` metadata table. |
+| `ADMIN_PASSWORD` | Password for `/admin/login`. Without it the admin area cannot be used. |
+| `ADMIN_SESSION_SECRET` | Long random string used to sign the admin session cookie (e.g. `openssl rand -hex 32`). |
+| `BLOB_READ_WRITE_TOKEN` | Added by Vercel when a Blob store is connected; required to issue browser upload tokens. |
+
 ### Cloudflare Turnstile (optional)
 
 | Variable | Purpose |
@@ -157,9 +168,36 @@ contact_messages (
   user_agent  TEXT,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 )
+
+app_downloads (
+  id            BIGSERIAL PRIMARY KEY,
+  product_slug  TEXT NOT NULL UNIQUE,
+  file_name     TEXT NOT NULL,
+  version       TEXT,
+  size_bytes    BIGINT NOT NULL,
+  content_type  TEXT NOT NULL,
+  blob_url      TEXT NOT NULL,
+  download_url  TEXT NOT NULL,
+  blob_pathname TEXT NOT NULL,
+  uploaded_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+)
 ```
 
 The migration is idempotent and safe to run repeatedly.
+
+---
+
+## App downloads
+
+1. Sign in at `/admin/downloads` with `ADMIN_PASSWORD`.
+2. Choose a product, select an `.apk` file (up to 100 MB), add an optional version label and upload.
+3. The browser requests a short-lived token from `/api/admin/blob-token` and uploads the file **directly to Vercel Blob** — the APK never passes through a Vercel Function, so the 4.5 MB function body limit does not apply.
+4. The browser confirms the upload to `/api/admin/downloads`, which checks the Blob object with `head()`, stores its metadata in `app_downloads`, and deletes the previous APK from storage.
+5. The products page links to `/download/<slug>`. That route reads the current URL from the database and redirects to Blob's `download=1` URL, so the browser saves the file with its original name.
+
+`lib/site.ts` defines the available products and their slugs. To add another downloadable app, give it a `slug` and set `downloadUrl` to `/download/<slug>`; it will then appear in the admin dropdown. Admin pages are `noindex` and never prerendered.
+
+Upload endpoints require a signed, httpOnly session cookie, only accept the Android package MIME type, cap the size, and verify that the stored URL belongs to the `downloads/` folder of your Blob store before making it live.
 
 ---
 
@@ -245,7 +283,7 @@ Every item below must be supplied or approved by the site owner. Search the code
 - [ ] Confirm the **problem**, **solution** and **result** copy for the four case studies on `/portfolio`. The copy is drafted from the live sites and the results are factual delivery statements (no metrics) — replace them with specific, verified outcomes when available.
 - [ ] Confirm the client names on the case studies (Bhilzak, UkweliTally, Techlup, CAFHED) are approved for publication, and that the screenshots in `public/images/work-*.png` may be used.
 - [ ] Add further product entries for `/products` if needed — UkweliTally is already listed. Each needs a name, kind, summary, description, platforms, status, image and a download or website link.
-- [x] Supply the Deadlines & Notes download/share link: `deadline-1.0.24.apk` is shared publicly from Google Drive and the link is wired into the `downloadUrl` field in `lib/site.ts`. Device screenshots are in `public/images/deadlines-notes/`; the card uses the app logo (`deadlines-notes-logo.png`).
+- [x] Deadlines & Notes download: upload `deadline-1.0.24.apk` from `/admin/downloads` under slug `deadlines-notes`. The products page links to `/download/deadlines-notes`, which resolves the current file from the database. Device screenshots are in `public/images/deadlines-notes/`; the card uses the app logo (`deadlines-notes-logo.png`).
 
 ### Contact and company details
 
