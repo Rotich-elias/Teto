@@ -1,8 +1,8 @@
 import { Icon } from '@/components/icon';
-import { whatsappHref } from '@/lib/site';
+import { whatsappHref } from '@/lib/content';
 
-export function WhatsappButton() {
-  const href = whatsappHref();
+export async function WhatsappButton() {
+  const href = await whatsappHref();
   if (!href) return null;
 
   return (

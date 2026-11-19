@@ -1,15 +1,17 @@
 import Link from 'next/link';
 import { AnimatedBackground } from '@/components/animated-background';
 import { Icon } from '@/components/icon';
-import { company } from '@/lib/site';
+import { getCompany } from '@/lib/content';
 
 type Props = { title?: string; text?: string; button?: string };
 
-export function Cta({
+export async function Cta({
   title = 'Have a project in mind?',
   text = 'Tell us what you are trying to build or fix. We will reply with practical next steps.',
   button = 'Get a Quote',
 }: Props) {
+  const company = await getCompany();
+
   return (
     <section className="container-page py-16 sm:py-20">
       <div className="relative overflow-hidden rounded-4xl bg-primary-950 px-6 py-12 text-white shadow-soft sm:px-12 sm:py-16">

@@ -4,8 +4,10 @@ import { Cta } from '@/components/cta';
 import { Icon } from '@/components/icon';
 import { PageHero } from '@/components/page-hero';
 import { OrTodo, Todo } from '@/components/todo';
+import { getPortfolio } from '@/lib/content';
 import { pageMetadata } from '@/lib/metadata';
-import { portfolio } from '@/lib/site';
+
+const FALLBACK_IMAGE = '/images/logo.png';
 
 export const metadata = pageMetadata({
   title: 'Our Work | Teto Technologies',
@@ -13,7 +15,9 @@ export const metadata = pageMetadata({
   path: '/portfolio',
 });
 
-export default function PortfolioPage() {
+export default async function PortfolioPage() {
+  const portfolio = await getPortfolio();
+
   return (
     <>
       <PageHero
@@ -28,7 +32,7 @@ export default function PortfolioPage() {
             <div className="grid lg:grid-cols-[0.85fr_1.15fr]">
               <div className="relative min-h-64 overflow-hidden bg-surface-sunken">
                 <Image
-                  src={project.image}
+                  src={project.image || FALLBACK_IMAGE}
                   alt={`Screenshot of ${project.title ?? 'a Teto case study'}`}
                   width={1200}
                   height={750}

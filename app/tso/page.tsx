@@ -4,8 +4,8 @@ import { Icon } from '@/components/icon';
 import { PageHero } from '@/components/page-hero';
 import { SectionHeading } from '@/components/section-heading';
 import { Todo } from '@/components/todo';
+import { getServices, getTso } from '@/lib/content';
 import { pageMetadata } from '@/lib/metadata';
-import { services, tso } from '@/lib/site';
 
 export const metadata = pageMetadata({
   title: 'TSO — Take Schools Online | Teto Technologies',
@@ -14,7 +14,8 @@ export const metadata = pageMetadata({
   path: '/tso',
 });
 
-export default function TsoPage() {
+export default async function TsoPage() {
+  const [services, tso] = await Promise.all([getServices(), getTso()]);
   const turnstileSiteKey = process.env.TURNSTILE_ENABLED === 'true' ? process.env.TURNSTILE_SITE_KEY : undefined;
 
   return (

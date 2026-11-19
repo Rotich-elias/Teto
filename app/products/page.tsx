@@ -3,8 +3,8 @@ import { Cta } from '@/components/cta';
 import { Icon } from '@/components/icon';
 import { PageHero } from '@/components/page-hero';
 import { Todo } from '@/components/todo';
+import { getProducts } from '@/lib/content';
 import { pageMetadata } from '@/lib/metadata';
-import { products } from '@/lib/site';
 
 export const metadata = pageMetadata({
   title: 'Products | Teto Technologies',
@@ -12,7 +12,9 @@ export const metadata = pageMetadata({
   path: '/products',
 });
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  const products = await getProducts();
+
   return (
     <>
       <PageHero
@@ -26,8 +28,7 @@ export default function ProductsPage() {
           <div className="card border-dashed p-8 text-center">
             <p className="text-sm font-semibold text-ink">No products listed yet.</p>
             <p className="mt-2 text-sm text-ink-soft">
-              Add entries in <code className="rounded bg-surface-sunken px-1.5 py-0.5 text-xs">lib/site.ts</code> under{' '}
-              <code className="rounded bg-surface-sunken px-1.5 py-0.5 text-xs">products</code>.
+              Add products from the <a href="/admin/products" className="font-semibold text-primary-700 underline dark:text-primary-300">admin area</a>.
             </p>
           </div>
         ) : (

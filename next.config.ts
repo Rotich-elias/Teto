@@ -20,6 +20,8 @@ function contentSecurityPolicy(): string {
     'https://*.private.blob.vercel-storage.com',
   ];
   const frames: string[] = [];
+  // Admin-uploaded images are served directly from Vercel Blob.
+  const blobImages = 'https://*.public.blob.vercel-storage.com';
 
   if (!isProd) {
     scripts.push("'unsafe-eval'");
@@ -42,7 +44,7 @@ function contentSecurityPolicy(): string {
     "object-src 'none'",
     "frame-ancestors 'none'",
     "form-action 'self'",
-    "img-src 'self' data:",
+    `img-src 'self' data: ${blobImages}`,
     "font-src 'self' data:",
     "style-src 'self' 'unsafe-inline'",
     `script-src ${scripts.join(' ')}`,
@@ -70,6 +72,15 @@ if (isProd) {
 }
 
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.public.blob.vercel-storage.com',
+        pathname: '/images/**',
+      },
+    ],
+  },
   turbopack: {
     root: process.cwd(),
   },

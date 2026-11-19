@@ -3,8 +3,8 @@ import { Icon } from '@/components/icon';
 import { PageHero } from '@/components/page-hero';
 import { SectionHeading } from '@/components/section-heading';
 import { OrTodo } from '@/components/todo';
+import { getCompany, getValues } from '@/lib/content';
 import { pageMetadata } from '@/lib/metadata';
-import { company, values } from '@/lib/site';
 
 export const metadata = pageMetadata({
   title: 'About Teto Technologies | Kenyan Software & Networking Company',
@@ -13,16 +13,17 @@ export const metadata = pageMetadata({
   path: '/about',
 });
 
-const companyDetails: { label: string; value: string | null; todo: string }[] = [
-  { label: 'Registered name', value: company.legalName, todo: 'registered business name' },
-  { label: 'Registration number', value: company.registrationNumber, todo: 'business registration number' },
-  { label: 'Founder', value: company.founder, todo: 'founder name' },
-  { label: 'Founded', value: company.founded, todo: 'founding year' },
-  { label: 'Location', value: company.address, todo: 'physical address' },
-  { label: 'Business hours', value: company.hours, todo: 'business hours' },
-];
+export default async function AboutPage() {
+  const [company, values] = await Promise.all([getCompany(), getValues()]);
+  const companyDetails: { label: string; value: string | null; todo: string }[] = [
+    { label: 'Registered name', value: company.legalName, todo: 'registered business name' },
+    { label: 'Registration number', value: company.registrationNumber, todo: 'business registration number' },
+    { label: 'Founder', value: company.founder, todo: 'founder name' },
+    { label: 'Founded', value: company.founded, todo: 'founding year' },
+    { label: 'Location', value: company.address, todo: 'physical address' },
+    { label: 'Business hours', value: company.hours, todo: 'business hours' },
+  ];
 
-export default function AboutPage() {
   return (
     <>
       <PageHero

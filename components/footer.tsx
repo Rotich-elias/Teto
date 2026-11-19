@@ -2,7 +2,8 @@ import Link from 'next/link';
 import { Icon, type IconName } from '@/components/icon';
 import { Logo } from '@/components/logo';
 import { Todo } from '@/components/todo';
-import { company, services, social, telHref } from '@/lib/site';
+import { getCompany, getServices, getSocial } from '@/lib/content';
+import { telHref } from '@/lib/site';
 
 const linkClass = 'text-sm text-ink-soft transition hover:text-primary-700 dark:hover:text-primary-300';
 
@@ -24,7 +25,8 @@ function ContactItem({ icon, children }: { icon: IconName; children: React.React
   );
 }
 
-export function Footer() {
+export async function Footer() {
+  const [company, services, social] = await Promise.all([getCompany(), getServices(), getSocial()]);
   const socialLinks = social.filter((item) => item.url);
 
   return (

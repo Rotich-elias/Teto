@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { AdminDownloadsForm } from '@/components/admin-downloads-form';
 import { PageHero } from '@/components/page-hero';
 import { isAdmin } from '@/lib/admin-auth';
+import { getProducts } from '@/lib/content';
 import {
   MAX_APK_BYTES,
   downloadsConfigured,
@@ -10,7 +11,6 @@ import {
   type AppDownload,
 } from '@/lib/downloads';
 import { pageMetadata } from '@/lib/metadata';
-import { products } from '@/lib/site';
 
 export const dynamic = 'force-dynamic';
 
@@ -40,6 +40,7 @@ export default async function AdminDownloadsPage() {
     }
   }
 
+  const products = await getProducts();
   const options = products
     .filter((product) => Boolean(product.slug))
     .map((product) => ({ slug: product.slug!, name: product.name ?? product.slug! }));

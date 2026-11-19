@@ -502,6 +502,36 @@ export const products: Product[] = [
   },
 ];
 
+/** Editable homepage copy. Defaults keep the current design intact. */
+export const homepage = {
+  eyebrow: 'Kenyan software & networking company',
+  title: 'Software and networks that work.',
+  highlight: 'work.',
+  lead: 'Teto Technologies builds web apps, mobile apps, payment integrations and network solutions for Kenyan businesses.',
+  bullets: ['Web & mobile', 'M-Pesa Daraja', 'MikroTik & Cisco'],
+  servicesEyebrow: 'What we do',
+  servicesTitle: 'One team for software, hosting, payments and networks.',
+  servicesText: 'Seven focused services that cover the path from a first website to the infrastructure behind it.',
+  whyEyebrow: 'Why Teto',
+  whyTitle: 'Built by people who understand the environment it runs in.',
+  whyText:
+    'Good software is only half the job. The payment callback, the router, the server and the support behind it all have to hold together.',
+  quote: 'We build for Kenyan users and networks, and hold the work to the engineering standards expected anywhere.',
+  processEyebrow: 'How we work',
+  processTitle: 'A clear process, without the theatre.',
+  processText: 'You always know what stage the work is at, what is next, and what we need from you.',
+  workEyebrow: 'Selected work',
+  workTitle: 'Work we can talk about.',
+  workText: 'A selection of client projects and our own products. Results are added once the client confirms them.',
+  techEyebrow: 'Tools we work with',
+  techTitle: 'A practical stack, chosen for maintainability.',
+  techText: 'Proven tools with large communities, so your team is never locked in to one developer or one vendor.',
+  statLabel: 'Services',
+  foundedLabel: 'Founded',
+  locationLabel: 'Based in',
+  location: 'Kenya',
+};
+
 export const seo = {
   defaultTitle: 'Teto Technologies | Software and Networks That Work in Kenya',
   defaultDescription:

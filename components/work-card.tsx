@@ -9,7 +9,7 @@ export function WorkCard({ project, index }: { project: Project; index: number }
     <article className="group card overflow-hidden transition duration-200 hover:border-primary-600/50 hover:shadow-lift">
       <div className="relative aspect-[16/10] overflow-hidden bg-surface-sunken">
         <Image
-          src={project.image}
+          src={project.image || '/images/logo.png'}
           alt={`Screenshot of ${project.title ?? 'a Teto case study'}`}
           width={1200}
           height={750}

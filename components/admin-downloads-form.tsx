@@ -82,7 +82,7 @@ export function AdminDownloadsForm({
       const blob = await upload(`downloads/${slug}/${safeName}`, file, {
         access: 'public',
         handleUploadUrl: '/api/admin/blob-token',
-        clientPayload: slug,
+        clientPayload: JSON.stringify({ kind: 'apk', slug }),
         contentType: APK_MIME_TYPE,
         multipart: file.size > 5 * 1024 * 1024,
         onUploadProgress: ({ percentage }) => setProgress(Math.round(percentage)),
@@ -138,24 +138,13 @@ export function AdminDownloadsForm({
     }
   }
 
-  async function handleLogout() {
-    await fetch('/api/admin/logout', { method: 'POST' });
-    router.push('/admin/login');
-    router.refresh();
-  }
-
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h2 className="text-lg font-bold">Upload an app</h2>
-          <p className="mt-1 text-sm text-ink-soft">
-            The file goes straight to storage and becomes the download on the products page.
-          </p>
-        </div>
-        <button type="button" onClick={handleLogout} className="btn-secondary text-sm">
-          Sign out
-        </button>
+      <div>
+        <h2 className="text-lg font-bold">Upload an app</h2>
+        <p className="mt-1 text-sm text-ink-soft">
+          The file goes straight to storage and becomes the download on the products page.
+        </p>
       </div>
 
       <form onSubmit={handleUpload} className="card space-y-5 p-6">

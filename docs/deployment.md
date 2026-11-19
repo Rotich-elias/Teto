@@ -22,8 +22,8 @@ your machine.
 ```bash
 npm install
 npm run typecheck   # tsc --noEmit — expect no output
-npm run test        # vitest — expect 23 passed
-npm run build       # next build — expect 18 routes, no warnings
+npm run test        # vitest — expect all tests to pass
+npm run build       # next build — expect no errors
 ```
 
 Then run it locally and click through the site:
@@ -42,7 +42,7 @@ success message — that is expected.
 
 ## 1. Database — Neon Postgres
 
-The contact form stores enquiries in a `contact_messages` table.
+Neon stores contact enquiries, editable site content, app-download metadata, media records and inbox actions. The migration creates every table at once and is safe to run repeatedly.
 
 ### 1.1 Create the database
 
@@ -72,6 +72,13 @@ Expected output:
 ```text
 ✓ create contact_messages table
 ✓ index contact_messages by created_at
+✓ create app_downloads table
+✓ add read flag to contact_messages
+✓ index unread contact_messages
+✓ create site_content table
+✓ create content_changes table
+✓ index content_changes by date
+✓ create media_assets table
 Migration complete.
 ```
 
@@ -87,7 +94,45 @@ contact_messages (
   message     TEXT NOT NULL,
   ip          TEXT,
   user_agent  TEXT,
+  read        BOOLEAN NOT NULL DEFAULT false,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+)
+
+app_downloads (
+  id            BIGSERIAL PRIMARY KEY,
+  product_slug  TEXT NOT NULL UNIQUE,
+  file_name     TEXT NOT NULL,
+  version       TEXT,
+  size_bytes    BIGINT NOT NULL,
+  content_type  TEXT NOT NULL,
+  blob_url      TEXT NOT NULL,
+  download_url  TEXT NOT NULL,
+  blob_pathname TEXT NOT NULL,
+  uploaded_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+)
+
+site_content (
+  key         TEXT PRIMARY KEY,
+  data        JSONB NOT NULL,
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+)
+
+content_changes (
+  id          BIGSERIAL PRIMARY KEY,
+  section     TEXT NOT NULL,
+  action      TEXT NOT NULL,
+  snapshot    JSONB,
+  changed_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+)
+
+media_assets (
+  id            BIGSERIAL PRIMARY KEY,
+  pathname      TEXT NOT NULL UNIQUE,
+  url           TEXT NOT NULL,
+  file_name     TEXT NOT NULL,
+  content_type  TEXT NOT NULL,
+  size_bytes    BIGINT NOT NULL,
+  uploaded_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 )
 ```
 
@@ -110,21 +155,22 @@ Expect `[{ n: 0 }]`. (Or use the Neon SQL editor: `SELECT count(*) FROM contact_
 
 **Keep this connection string secret.** It grants read/write to the database.
 
-### 1.5 App downloads — Vercel Blob
+### 1.5 Admin, downloads and CMS — Vercel Blob
 
-The APK linked from `/products` is served from Vercel Blob, with its metadata in the same Neon database. The admin page at `/admin/downloads` uploads files directly from the browser, so large APKs are not limited by Vercel's 4.5 MB function payload cap.
+APKs and uploaded images are served from Vercel Blob; their metadata and all editable content live in the same Neon database. The browser uploads files directly to Blob, so large APKs are not limited by Vercel's 4.5 MB function payload cap.
 
-1. In Vercel, open the project's **Storage** tab → **Create Storage** → **Blob**. Choose **Public** access, name it (for example `app-downloads`), select **Add a read-write token env var to this connection**, and connect it to Production, Preview and Development. The read-write token is required to issue browser upload tokens.
+1. In Vercel, open the project's **Storage** tab → **Create Storage** → **Blob**. Choose **Public** access, name it (for example `site-assets`), select **Add a read-write token env var to this connection**, and connect it to Production, Preview and Development. The read-write token is required to issue browser upload tokens.
 2. Locally, run `vercel env pull` so `.env.local` receives `BLOB_READ_WRITE_TOKEN` (and the OIDC variables Vercel adds).
 3. Generate the admin credentials and set them in Vercel and `.env.local`:
    ```bash
    openssl rand -hex 32   # use as ADMIN_SESSION_SECRET
    ```
-   `ADMIN_PASSWORD` is the password you will use at `/admin/login`. Keep both secret.
-4. Run `npm run db:migrate` again — it also creates the `app_downloads` table.
-5. After deploying, sign in at `https://teto.co.ke/admin/downloads` and upload `deadline-1.0.24.apk` for the **Deadlines & Notes** product. Then confirm `/download/deadlines-notes` redirects and saves the APK.
+   `ADMIN_PASSWORD` is the single password for the whole `/admin` area. Keep both secret.
+4. Run `npm run db:migrate` again — it creates `app_downloads`, `site_content`, `content_changes` and `media_assets` as well as adding the inbox `read` flag.
+5. After deploying, sign in at `https://teto.co.ke/admin`. Work through `/admin/status`, then edit products, portfolio, company details, social links, TSO price, services, homepage and SEO in the relevant editors. Upload `deadline-1.0.24.apk` from **App downloads** under the `deadlines-notes` slug and confirm `/download/deadlines-notes` saves the APK.
+6. Export a JSON backup from `/admin/backup` and keep it somewhere safe.
 
-Uploading a replacement on the admin page updates the public download immediately; no code change or redeploy is needed.
+Every admin save updates the cached content immediately; no code change or redeploy is needed.
 
 ---
 
@@ -210,13 +256,14 @@ repo.
 | `RESEND_API_KEY` | Resend key (step 2) |
 | `CONTACT_TO_EMAIL` | `tetoteknologies@gmail.com, elgeiy8@gmail.com` |
 | `CONTACT_FROM_EMAIL` | verified sender, e.g. `Teto Technologies <no-reply@teto.co.ke>` |
-| `ADMIN_PASSWORD` | Password for `/admin/downloads` (step 1.5) |
+| `ADMIN_PASSWORD` | Password for the whole `/admin` area (step 1.5) |
 | `ADMIN_SESSION_SECRET` | `openssl rand -hex 32` (step 1.5) |
 
 Vercel adds `BLOB_READ_WRITE_TOKEN`, `BLOB_STORE_ID` and `VERCEL_OIDC_TOKEN` automatically when the Blob store is connected (step 1.5). No manual entry is needed for those.
 
-**Company details** — blank values render a visible `TODO(owner)` badge (except
-the social URLs, which simply hide their icons), so fill in as many as you have:
+**Company details** — these are seed defaults. Values saved in `/admin` override
+them immediately; blank values render a visible `TODO(owner)` badge (except the
+social URLs, which simply hide their icons), so fill in as many as you have:
 
 ```text
 TETO_EMAIL, TETO_DATA_EMAIL, TETO_PHONE, TETO_WHATSAPP, TETO_WHATSAPP_MESSAGE,
@@ -244,9 +291,10 @@ TURNSTILE_ENABLED, TURNSTILE_SITE_KEY, TURNSTILE_SECRET_KEY
 
 Deploy. Vercel runs `next build`; the pages are prerendered at build time.
 
-> **Important:** because pages are prerendered, changing any `TETO_*` variable
-> or `NEXT_PUBLIC_SITE_URL` requires a **redeploy** to take effect. Changing
-> `DATABASE_URL`/`RESEND_API_KEY` does not (those are used at request time).
+> **Important:** because pages are prerendered, changing a `TETO_*` seed value
+> or `NEXT_PUBLIC_SITE_URL` requires a **redeploy** to take effect where it has
+> not been overridden in the admin. Content saved in `/admin`, uploads and
+> `DATABASE_URL`/`RESEND_API_KEY` changes take effect without a redeploy.
 
 ---
 
@@ -300,6 +348,10 @@ curl -s -o /dev/null -w "robots=%{http_code}\n"  https://teto.co.ke/robots.txt
 
 # 6. App download (expect 302 to a *.public.blob.vercel-storage.com URL)
 curl -s -o /dev/null -w "download=%{http_code} %{redirect_url}\n" https://teto.co.ke/download/deadlines-notes
+
+# 7. Admin is private and reachable after login (expect 307 → /admin/login, then 200)
+curl -s -o /dev/null -w "admin=%{http_code} %{redirect_url}\n" https://teto.co.ke/admin
+curl -s -o /dev/null -w "login=%{http_code}\n" https://teto.co.ke/admin/login
 ```
 
 Then confirm:
@@ -311,6 +363,8 @@ Then confirm:
       `SELECT * FROM contact_messages ORDER BY created_at DESC LIMIT 1;`
 - [ ] `/contact?status=sent` shows the green banner and `/contact?status=invalid`
       the red one.
+- [ ] `/admin/status` reports no remaining TODO placeholders.
+- [ ] The test enquiry appears in `/admin/messages` and can be marked as read.
 - [ ] No `TODO(owner)` badges remain on any public page (search the rendered
       pages for the text).
 - [ ] The WhatsApp button opens `wa.me` with the pre-filled message.
@@ -350,21 +404,26 @@ a database change.
 | 429 from the contact endpoint | Rate limit hit (5/hour/IP). The database-backed count shares this across instances. |
 | Turnstile widget missing | `TURNSTILE_ENABLED=true` and `TURNSTILE_SITE_KEY` must both be set, then redeploy. |
 | Map shows a placeholder | `TETO_MAP_EMBED_URL` is blank; set it and redeploy. |
-| Company details not updating | `TETO_*` values are baked in at build time — redeploy after changing them. |
+| Company details not updating | Admin-saved values take priority. If no override exists, `TETO_*` values are baked in at build time — redeploy after changing them. |
 | CSP blocks Turnstile or Maps | Ensure the feature is enabled (`TURNSTILE_ENABLED=true` / `TETO_MAP_EMBED_URL` set) and redeploy so `next.config.ts` includes the origins. |
 | Admin login says "not configured" | Set `ADMIN_PASSWORD` and `ADMIN_SESSION_SECRET` in Vercel, then redeploy. |
 | Upload fails with a CSP error | Redeploy after connecting the Blob store — `next.config.ts` allows the Blob origins in `connect-src`. |
 | Upload is rejected as "unexpected upload location" | The Blob store must be public and the file must land under `downloads/<slug>/`. Re-upload from `/admin/downloads`. |
 | `/download/<slug>` redirects to `/products` | No active row in `app_downloads`. Run `npm run db:migrate` and upload the APK from the admin page. |
+| Admin editor says `DATABASE_URL is not configured` | Set `DATABASE_URL` in Vercel and redeploy. The site still renders built-in defaults without it, but saves are disabled. |
+| Edits fail with `site_content does not exist` | Run `npm run db:migrate` against the production database. |
+| An uploaded image is blocked by Next.js | Confirm the Blob store is public and the URL begins with `https://*.public.blob.vercel-storage.com/images/`. Redeploy after changing Blob settings so `next.config.ts` picks up the image domain. |
+| Content edit saved but page looks stale | Hard-refresh once; saves invalidate the tagged cache and the root layout. Check the **Change history** page to confirm the save landed. |
 
 ---
 
 ## Final go-live checklist
 
 - [ ] `npm run typecheck`, `npm run test` and `npm run build` pass.
-- [ ] `DATABASE_URL` set and `contact_messages` exists in production.
-- [ ] Blob store connected, `app_downloads` table created, and `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET` set (step 1.5).
-- [ ] APK uploaded from `/admin/downloads` and `/download/deadlines-notes` saves the file.
+- [ ] `DATABASE_URL` set and all migration tables exist in production.
+- [ ] Blob store connected, and `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET` set (step 1.5).
+- [ ] `/admin/status` has no TODO placeholders; JSON backup exported from `/admin/backup`.
+- [ ] APK uploaded from **App downloads** and `/download/deadlines-notes` saves the file.
 - [ ] `RESEND_API_KEY` set and `CONTACT_FROM_EMAIL` uses a verified domain.
 - [ ] `NEXT_PUBLIC_SITE_URL` set to the canonical HTTPS origin.
 - [ ] All required `TETO_*` company details filled in; the remaining social

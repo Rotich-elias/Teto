@@ -1,4 +1,5 @@
-import { company, seo, siteUrl, social } from '@/lib/site';
+import { getCompany, getSeo, getSocial } from '@/lib/content';
+import { siteUrl } from '@/lib/site';
 
 function compact(input: Record<string, unknown>) {
   return Object.fromEntries(
@@ -7,7 +8,8 @@ function compact(input: Record<string, unknown>) {
 }
 
 /** JSON-LD for the organisation, plus LocalBusiness on pages that want it. */
-export function Schema({ localBusiness = false }: { localBusiness?: boolean }) {
+export async function Schema({ localBusiness = false }: { localBusiness?: boolean }) {
+  const [company, seo, social] = await Promise.all([getCompany(), getSeo(), getSocial()]);
   const base = siteUrl();
   const sameAs = social.map((item) => item.url).filter(Boolean);
   const address = company.address ? { '@type': 'PostalAddress', streetAddress: company.address, addressCountry: 'KE' } : null;

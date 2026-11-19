@@ -178,6 +178,9 @@ const paths = {
 
 export type IconName = keyof typeof paths;
 
+/** Every available icon name, used by the admin icon pickers. */
+export const iconNames = Object.keys(paths) as IconName[];
+
 const filled = new Set<IconName>(['linkedin', 'github', 'x', 'facebook', 'tiktok', 'whatsapp']);
 
 type IconProps = Omit<SVGProps<SVGSVGElement>, 'name'> & { name: IconName };

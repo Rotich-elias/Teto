@@ -8,10 +8,28 @@ import {
   isValidProductSlug,
 } from '@/lib/downloads';
 
+const IMAGE_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+
+type Payload = { kind: 'apk'; slug: string } | { kind: 'image' };
+
+function parsePayload(clientPayload: string | null): Payload | null {
+  if (!clientPayload) return null;
+  try {
+    const value = JSON.parse(clientPayload) as Partial<Payload>;
+    if (value?.kind === 'image') return { kind: 'image' };
+    if (value?.kind === 'apk' && typeof value.slug === 'string') return { kind: 'apk', slug: value.slug };
+  } catch {
+    // Legacy payload: the download form used to send the slug as plain text.
+    if (isValidProductSlug(clientPayload)) return { kind: 'apk', slug: clientPayload };
+  }
+  return null;
+}
+
 /**
- * Issues short-lived client tokens for direct-to-Blob APK uploads. The file
- * bytes never pass through a Vercel Function, so the 4.5 MB body limit does
- * not apply.
+ * Issues short-lived client tokens for direct-to-Blob uploads. File bytes
+ * never pass through a Vercel Function, so the 4.5 MB body limit does not
+ * apply. APKs are capped at 100 MB and images at 10 MB.
  */
 export async function POST(request: Request) {
   if (!(await isAdmin())) {
@@ -30,21 +48,33 @@ export async function POST(request: Request) {
       body,
       request,
       onBeforeGenerateToken: async (pathname, clientPayload) => {
-        // Check again here: this callback is the actual gate for token issuing.
         if (!(await isAdmin())) throw new Error('Not authenticated.');
 
-        const slug = clientPayload ?? '';
-        if (!isValidProductSlug(slug)) throw new Error('Invalid product.');
-        if (!pathname.startsWith(`${DOWNLOAD_PATH_PREFIX}${slug}/`)) {
-          throw new Error('Invalid upload path.');
+        const payload = parsePayload(clientPayload);
+        if (!payload) throw new Error('Invalid upload type.');
+
+        if (payload.kind === 'apk') {
+          const { slug } = payload;
+          if (!isValidProductSlug(slug)) throw new Error('Invalid product.');
+          if (!pathname.startsWith(`${DOWNLOAD_PATH_PREFIX}${slug}/`)) throw new Error('Invalid upload path.');
+          if (!pathname.toLowerCase().endsWith('.apk')) throw new Error('Only APK files are allowed.');
+
+          return {
+            allowedContentTypes: [APK_MIME_TYPE],
+            maximumSizeInBytes: MAX_APK_BYTES,
+            addRandomSuffix: true,
+            tokenPayload: JSON.stringify(payload),
+          };
         }
-        if (!pathname.toLowerCase().endsWith('.apk')) throw new Error('Only APK files are allowed.');
+
+        if (!pathname.startsWith('images/')) throw new Error('Invalid image path.');
+        if (!/\.(png|jpe?g|webp|gif)$/i.test(pathname)) throw new Error('Unsupported image format.');
 
         return {
-          allowedContentTypes: [APK_MIME_TYPE],
-          maximumSizeInBytes: MAX_APK_BYTES,
+          allowedContentTypes: IMAGE_TYPES,
+          maximumSizeInBytes: MAX_IMAGE_BYTES,
           addRandomSuffix: true,
-          tokenPayload: JSON.stringify({ slug }),
+          tokenPayload: JSON.stringify(payload),
         };
       },
     });

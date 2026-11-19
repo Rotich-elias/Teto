@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { Cta } from '@/components/cta';
 import { Icon } from '@/components/icon';
 import { PageHero } from '@/components/page-hero';
+import { getServices } from '@/lib/content';
 import { pageMetadata } from '@/lib/metadata';
-import { services } from '@/lib/site';
 
 export const metadata = pageMetadata({
   title: 'Software, Hosting, Payments & Network Services | Teto Technologies',
@@ -12,7 +12,9 @@ export const metadata = pageMetadata({
   path: '/services',
 });
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const services = await getServices();
+
   return (
     <>
       <PageHero

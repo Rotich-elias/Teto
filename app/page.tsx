@@ -6,17 +6,38 @@ import { Cta } from '@/components/cta';
 import { Schema } from '@/components/schema';
 import { SectionHeading } from '@/components/section-heading';
 import { WorkCard } from '@/components/work-card';
+import {
+  getCompany,
+  getHomepage,
+  getPortfolio,
+  getProcessSteps,
+  getServices,
+  getSeo,
+  getTech,
+  getValues,
+} from '@/lib/content';
 import { pageMetadata } from '@/lib/metadata';
-import { company, portfolio, processSteps, services, tech, values } from '@/lib/site';
 
-export const metadata = pageMetadata({
-  title: 'Teto Technologies | Software and Networks That Work in Kenya',
-  description:
-    'Teto Technologies builds web apps, mobile apps, M-Pesa Daraja integrations and MikroTik network solutions for Kenyan businesses. Get a quote.',
-  path: '/',
-});
+export async function generateMetadata() {
+  const seo = await getSeo();
+  return pageMetadata({
+    title: seo.defaultTitle,
+    description: seo.defaultDescription,
+    path: '/',
+  });
+}
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [company, h, portfolio, processSteps, services, tech, values] = await Promise.all([
+    getCompany(),
+    getHomepage(),
+    getPortfolio(),
+    getProcessSteps(),
+    getServices(),
+    getTech(),
+    getValues(),
+  ]);
+
   return (
     <>
       <Schema localBusiness />
@@ -32,13 +53,13 @@ export default function HomePage() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-500 opacity-60" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-primary-600" />
               </span>
-              Kenyan software &amp; networking company
+              {h.eyebrow}
             </p>
 
             <h1 className="mt-6 text-[2.6rem] font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-[4.1rem]">
-              Software and networks that{' '}
+              {h.title.replace(h.highlight, '').trim()}{' '}
               <span className="relative inline-block whitespace-nowrap text-primary-700 dark:text-primary-300">
-                work.
+                {h.highlight}
                 <svg
                   className="absolute -bottom-2 left-0 h-3 w-full text-accent-500"
                   viewBox="0 0 200 12"
@@ -52,7 +73,7 @@ export default function HomePage() {
             </h1>
 
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-soft">
-              Teto Technologies builds web apps, mobile apps, payment integrations and network solutions for Kenyan businesses.
+              {h.lead}
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -66,7 +87,7 @@ export default function HomePage() {
             </div>
 
             <ul className="mt-8 flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-ink-soft">
-              {['Web & mobile', 'M-Pesa Daraja', 'MikroTik & Cisco'].map((item) => (
+              {h.bullets.map((item) => (
                 <li key={item} className="inline-flex items-center gap-1.5">
                   <Icon name="check" className="h-4 w-4 text-primary-600 dark:text-primary-400" />
                   {item}
@@ -85,9 +106,9 @@ export default function HomePage() {
       <section id="services" className="container-page py-16 sm:py-20 lg:py-24">
         <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <SectionHeading
-            eyebrow="What we do"
-            title="One team for software, hosting, payments and networks."
-            text="Seven focused services that cover the path from a first website to the infrastructure behind it."
+            eyebrow={h.servicesEyebrow}
+            title={h.servicesTitle}
+            text={h.servicesText}
           />
           <Link href="/services" className="btn-link shrink-0">
             All services
@@ -143,34 +164,30 @@ export default function HomePage() {
           <div>
             <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary-200">
               <span className="block h-px w-6 bg-accent-400" />
-              Why Teto
+              {h.whyEyebrow}
             </p>
-            <h2 className="mt-3 text-3xl font-extrabold leading-tight text-white sm:text-4xl">
-              Built by people who understand the environment it runs in.
-            </h2>
-            <p className="mt-4 text-base leading-relaxed text-primary-100/80">
-              Good software is only half the job. The payment callback, the router, the server and the support behind it all have to hold together.
-            </p>
+            <h2 className="mt-3 text-3xl font-extrabold leading-tight text-white sm:text-4xl">{h.whyTitle}</h2>
+            <p className="mt-4 text-base leading-relaxed text-primary-100/80">{h.whyText}</p>
 
             <dl className="mt-8 grid grid-cols-3 gap-6 border-t border-white/10 pt-6">
               <div>
                 <dt className="font-display text-3xl font-extrabold text-white">{services.length}</dt>
-                <dd className="mt-1 text-xs font-semibold uppercase tracking-wider text-primary-200">Services</dd>
+                <dd className="mt-1 text-xs font-semibold uppercase tracking-wider text-primary-200">{h.statLabel}</dd>
               </div>
               <div>
                 <dt className="font-display text-3xl font-extrabold text-white">{company.founded ?? '—'}</dt>
-                <dd className="mt-1 text-xs font-semibold uppercase tracking-wider text-primary-200">Founded</dd>
+                <dd className="mt-1 text-xs font-semibold uppercase tracking-wider text-primary-200">{h.foundedLabel}</dd>
               </div>
               <div>
-                <dt className="font-display text-3xl font-extrabold text-white">Kenya</dt>
-                <dd className="mt-1 text-xs font-semibold uppercase tracking-wider text-primary-200">Based in</dd>
+                <dt className="font-display text-3xl font-extrabold text-white">{h.location}</dt>
+                <dd className="mt-1 text-xs font-semibold uppercase tracking-wider text-primary-200">{h.locationLabel}</dd>
               </div>
             </dl>
 
             <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-5">
               <p className="flex items-start gap-3 text-sm leading-relaxed text-primary-100/85">
                 <Icon name="quote" className="mt-0.5 h-5 w-5 shrink-0 text-accent-400" />
-                <span>We build for Kenyan users and networks, and hold the work to the engineering standards expected anywhere.</span>
+                <span>{h.quote}</span>
               </p>
             </div>
           </div>
@@ -192,9 +209,9 @@ export default function HomePage() {
       {/* Process */}
       <section className="container-page py-16 sm:py-20 lg:py-24">
         <SectionHeading
-          eyebrow="How we work"
-          title="A clear process, without the theatre."
-          text="You always know what stage the work is at, what is next, and what we need from you."
+          eyebrow={h.processEyebrow}
+          title={h.processTitle}
+          text={h.processText}
         />
 
         <ol className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-5 lg:gap-4">
@@ -218,9 +235,9 @@ export default function HomePage() {
         <div className="container-page py-16 sm:py-20 lg:py-24">
           <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <SectionHeading
-              eyebrow="Selected work"
-              title="Work we can talk about."
-              text="A selection of client projects and our own products. Results are added once the client confirms them."
+              eyebrow={h.workEyebrow}
+              title={h.workTitle}
+              text={h.workText}
             />
             <Link href="/portfolio" className="btn-link shrink-0">
               View all work
@@ -240,12 +257,10 @@ export default function HomePage() {
       <section className="container-page py-16 sm:py-20">
         <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
           <div className="max-w-xl">
-            <p className="eyebrow">Tools we work with</p>
-            <h2 className="mt-3 text-2xl font-extrabold sm:text-3xl">A practical stack, chosen for maintainability.</h2>
+            <p className="eyebrow">{h.techEyebrow}</p>
+            <h2 className="mt-3 text-2xl font-extrabold sm:text-3xl">{h.techTitle}</h2>
           </div>
-          <p className="max-w-md text-sm leading-relaxed text-ink-soft">
-            Proven tools with large communities, so your team is never locked in to one developer or one vendor.
-          </p>
+          <p className="max-w-md text-sm leading-relaxed text-ink-soft">{h.techText}</p>
         </div>
 
         <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">

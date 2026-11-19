@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
-import { company } from '@/lib/site';
 import type { ContactData } from '@/lib/contact';
+import type { CompanyContent } from '@/lib/content';
+import { company as defaultCompany } from '@/lib/site';
 
 const FROM_FALLBACK = 'Teto Technologies <onboarding@resend.dev>';
 
@@ -26,7 +27,7 @@ export function contactMailConfigured(): boolean {
 }
 
 /** Notification inboxes. CONTACT_TO_EMAIL accepts a comma-separated list. */
-export function notificationRecipients(): string[] {
+export function notificationRecipients(company: Pick<CompanyContent, 'email'> = defaultCompany): string[] {
   const configured = process.env.CONTACT_TO_EMAIL || company.email;
   if (!configured) return [];
   return configured
@@ -36,7 +37,11 @@ export function notificationRecipients(): string[] {
 }
 
 /** Send the company notification and the visitor auto-reply. */
-export async function sendContactEmails(data: ContactData, serviceName: string): Promise<void> {
+export async function sendContactEmails(
+  data: ContactData,
+  serviceName: string,
+  company: Pick<CompanyContent, 'name' | 'email'> = defaultCompany,
+): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
     console.warn('Contact email not sent: RESEND_API_KEY is not configured.');

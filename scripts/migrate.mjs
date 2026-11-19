@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Creates the contact_messages and app_downloads tables. Safe to run repeatedly.
+ * Creates all tables used by the contact form, downloads and admin CMS.
+ * Safe to run repeatedly.
  *
  *   npm run db:migrate
  *
@@ -58,6 +59,50 @@ const statements = [
       blob_url TEXT NOT NULL,
       download_url TEXT NOT NULL,
       blob_pathname TEXT NOT NULL,
+      uploaded_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`,
+  },
+  {
+    name: 'add read flag to contact_messages',
+    query: `ALTER TABLE contact_messages ADD COLUMN IF NOT EXISTS read BOOLEAN NOT NULL DEFAULT false`,
+  },
+  {
+    name: 'index unread contact_messages',
+    query: `CREATE INDEX IF NOT EXISTS contact_messages_read_idx
+      ON contact_messages (read, created_at DESC)`,
+  },
+  {
+    name: 'create site_content table',
+    query: `CREATE TABLE IF NOT EXISTS site_content (
+      key TEXT PRIMARY KEY,
+      data JSONB NOT NULL,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`,
+  },
+  {
+    name: 'create content_changes table',
+    query: `CREATE TABLE IF NOT EXISTS content_changes (
+      id BIGSERIAL PRIMARY KEY,
+      section TEXT NOT NULL,
+      action TEXT NOT NULL,
+      snapshot JSONB,
+      changed_at TIMESTAMPTZ NOT NULL DEFAULT now()
+    )`,
+  },
+  {
+    name: 'index content_changes by date',
+    query: `CREATE INDEX IF NOT EXISTS content_changes_changed_at_idx
+      ON content_changes (changed_at DESC)`,
+  },
+  {
+    name: 'create media_assets table',
+    query: `CREATE TABLE IF NOT EXISTS media_assets (
+      id BIGSERIAL PRIMARY KEY,
+      pathname TEXT NOT NULL UNIQUE,
+      url TEXT NOT NULL,
+      file_name TEXT NOT NULL,
+      content_type TEXT NOT NULL,
+      size_bytes BIGINT NOT NULL,
       uploaded_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )`,
   },

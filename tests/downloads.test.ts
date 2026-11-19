@@ -3,6 +3,7 @@ import {
   APK_MIME_TYPE,
   MAX_APK_BYTES,
   isDownloadsBlobUrl,
+  isImagesBlobUrl,
   isValidApkFileName,
   isValidApkSize,
   isValidProductSlug,
@@ -45,6 +46,14 @@ describe('download validation', () => {
     expect(isDownloadsBlobUrl(BLOB_URL.replace('.apk', '.exe'))).toBe(false);
     expect(isDownloadsBlobUrl('https://example.com/downloads/app.apk')).toBe(false);
     expect(isDownloadsBlobUrl('not a url')).toBe(false);
+  });
+
+  it('recognises public Blob URLs for uploaded images', () => {
+    const image = 'https://store123.public.blob.vercel-storage.com/images/123-logo.png';
+    expect(isImagesBlobUrl(image)).toBe(true);
+    expect(isImagesBlobUrl(image.replace('.png', '.apk'))).toBe(false);
+    expect(isImagesBlobUrl(image.replace('/images/', '/downloads/'))).toBe(false);
+    expect(isImagesBlobUrl('https://example.com/images/logo.png')).toBe(false);
   });
 
   it('adds the download parameter without losing other parameters', () => {

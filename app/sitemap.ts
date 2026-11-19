@@ -1,7 +1,9 @@
 import type { MetadataRoute } from 'next';
-import { services, siteUrl } from '@/lib/site';
+import { getServices } from '@/lib/content';
+import { siteUrl } from '@/lib/site';
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const services = await getServices();
   const base = siteUrl();
   const now = new Date();
 

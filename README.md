@@ -18,14 +18,15 @@ Marketing website for **Teto Technologies** (teto.co.ke), a Kenyan technology co
   - best-effort rate limit of 5 submissions per hour per IP, shared across serverless instances via the database when one is configured;
   - optional Cloudflare Turnstile;
   - AJAX success/error states, plus a no-JavaScript POST fallback that redirects back to `/contact?status=…`.
-- Admin area at `/admin/downloads` for uploading and replacing app APKs. Files are stored in Vercel Blob, metadata in Neon Postgres, and visitors download from stable `/download/<slug>` links — no Google Drive and no redeploy needed for a new version.
-- Floating WhatsApp button driven by `TETO_WHATSAPP`.
+- Admin area at `/admin` for editing products, portfolio (with images), contact details, social links, services, homepage copy, TSO price, SEO, app downloads, media and the contact inbox. Every change is saved to Neon Postgres and appears on the public site immediately — no code edit or redeploy.
+- APKs and images upload directly from the browser to Vercel Blob; metadata and content live in Neon. Visitors download from stable `/download/<slug>` links — no Google Drive.
+- Floating WhatsApp button driven by the admin company details (falling back to `TETO_WHATSAPP`).
 - Every “Get a Quote” link points to `/contact?service=<slug>` and preselects the service.
 - SEO: unique titles and descriptions, canonical URLs, Open Graph/Twitter metadata, JSON-LD, `sitemap.xml`, and `robots.txt`.
 - Security headers (CSP, HSTS, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, COOP) set in `next.config.ts`.
 - Responsive layout with light/dark mode via `prefers-color-scheme`.
 - Self-hosted Inter and Plus Jakarta Sans fonts.
-- Vitest unit tests for contact validation, site helpers and the rate limiter.
+- Vitest unit tests for contact validation, site helpers, content schemas, Blob URL validation and the rate limiter.
 
 ## Tech stack
 
@@ -34,8 +35,8 @@ Marketing website for **Teto Technologies** (teto.co.ke), a Kenyan technology co
 | Framework | Next.js 16 (App Router), React 19 |
 | Language | TypeScript |
 | Styling | Tailwind CSS 3 |
-| Database | Neon serverless Postgres (`@neondatabase/serverless`) |
-| File storage | Vercel Blob (`@vercel/blob`) for app downloads |
+| Database | Neon serverless Postgres (`@neondatabase/serverless`) for enquiries, CMS content, downloads and media metadata |
+| File storage | Vercel Blob (`@vercel/blob`) for APKs and uploaded images |
 | Mail | [Resend](https://resend.com) |
 | Tests | Vitest (`tests/`) |
 | Deployment | Vercel (or any Node 20+ host) |
@@ -46,7 +47,7 @@ Marketing website for **Teto Technologies** (teto.co.ke), a Kenyan technology co
 
 - Node.js 20.9 or newer (see `engines` in `package.json`)
 - npm
-- A Neon Postgres database (only needed for contact-form storage)
+- A Neon Postgres database (needed for the contact inbox, downloads and content editing)
 - A Resend API key (only needed for contact-form email)
 
 ## Local development
@@ -68,13 +69,13 @@ npm run dev
 
 The site is then available at <http://localhost:3000>.
 
-Without `DATABASE_URL` or `RESEND_API_KEY` the contact form still validates and reports success, but it logs a warning and does not store or email the enquiry. This keeps local development working with no external services.
+Without `DATABASE_URL` or `RESEND_API_KEY` the contact form still validates and reports success, but it logs a warning and does not store or email the enquiry. The site renders the built-in content defaults, but admin saves will fail until a database is configured. This keeps local development working with no external services.
 
 ---
 
 ## Environment variables
 
-All company details are read through `lib/site.ts`, so they can be changed without editing pages.
+`lib/site.ts` holds the built-in defaults for every editable section. When `DATABASE_URL` is set and the migration has run, values saved in `/admin` override those defaults immediately.
 
 ### Application
 
@@ -100,7 +101,7 @@ All company details are read through `lib/site.ts`, so they can be changed witho
 | `TETO_MAP_EMBED_URL` | Contact page map iframe |
 | `TETO_LINKEDIN`, `TETO_GITHUB`, `TETO_X`, `TETO_FACEBOOK`, `TETO_INSTAGRAM`, `TETO_TIKTOK` | Footer social links |
 
-Blank values render a visible `TODO(owner)` badge instead of inventing information; blank social URLs simply hide the social icons. Pages are prerendered, so redeploy after changing a variable.
+Blank values render a visible `TODO(owner)` badge instead of inventing information; blank social URLs simply hide the social icons. These variables are build-time seed defaults: redeploy after changing one that has not been overridden in the admin. Admin-edited values take priority and need no redeploy.
 
 ### Contact form email (Resend)
 
@@ -116,14 +117,14 @@ Blank values render a visible `TODO(owner)` badge instead of inventing informati
 | --- | --- |
 | `DATABASE_URL` | Postgres connection string. Without it, submissions are emailed but not stored. |
 
-### App downloads (admin + Vercel Blob)
+### Admin, downloads and CMS (Neon + Vercel Blob)
 
 | Variable | Purpose |
 | --- | --- |
-| `DATABASE_URL` | Same Neon database; also stores the `app_downloads` metadata table. |
-| `ADMIN_PASSWORD` | Password for `/admin/login`. Without it the admin area cannot be used. |
+| `DATABASE_URL` | Same Neon database; stores content, `app_downloads`, media and inbox data. |
+| `ADMIN_PASSWORD` | Password for `/admin/login`. Without it the whole admin area cannot be used. |
 | `ADMIN_SESSION_SECRET` | Long random string used to sign the admin session cookie (e.g. `openssl rand -hex 32`). |
-| `BLOB_READ_WRITE_TOKEN` | Added by Vercel when a Blob store is connected; required to issue browser upload tokens. |
+| `BLOB_READ_WRITE_TOKEN` | Added by Vercel when a Blob store is connected; required to issue browser upload tokens for APKs and images. |
 
 ### Cloudflare Turnstile (optional)
 
@@ -166,6 +167,7 @@ contact_messages (
   message     TEXT NOT NULL,
   ip          TEXT,
   user_agent  TEXT,
+  read        BOOLEAN NOT NULL DEFAULT false,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 )
 
@@ -179,6 +181,30 @@ app_downloads (
   blob_url      TEXT NOT NULL,
   download_url  TEXT NOT NULL,
   blob_pathname TEXT NOT NULL,
+  uploaded_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+)
+
+site_content (
+  key         TEXT PRIMARY KEY,
+  data        JSONB NOT NULL,
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+)
+
+content_changes (
+  id          BIGSERIAL PRIMARY KEY,
+  section     TEXT NOT NULL,
+  action      TEXT NOT NULL,
+  snapshot    JSONB,
+  changed_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+)
+
+media_assets (
+  id            BIGSERIAL PRIMARY KEY,
+  pathname      TEXT NOT NULL UNIQUE,
+  url           TEXT NOT NULL,
+  file_name     TEXT NOT NULL,
+  content_type  TEXT NOT NULL,
+  size_bytes    BIGINT NOT NULL,
   uploaded_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 )
 ```
@@ -195,15 +221,44 @@ The migration is idempotent and safe to run repeatedly.
 4. The browser confirms the upload to `/api/admin/downloads`, which checks the Blob object with `head()`, stores its metadata in `app_downloads`, and deletes the previous APK from storage.
 5. The products page links to `/download/<slug>`. That route reads the current URL from the database and redirects to Blob's `download=1` URL, so the browser saves the file with its original name.
 
-`lib/site.ts` defines the available products and their slugs. To add another downloadable app, give it a `slug` and set `downloadUrl` to `/download/<slug>`; it will then appear in the admin dropdown. Admin pages are `noindex` and never prerendered.
+Products and their slugs are managed in **Admin → Products**. To add another downloadable app, give it a `slug` and set its download URL to `/download/<slug>`; it will then appear in the APK upload dropdown. Admin pages are `noindex` and never prerendered.
 
 Upload endpoints require a signed, httpOnly session cookie, only accept the Android package MIME type, cap the size, and verify that the stored URL belongs to the `downloads/` folder of your Blob store before making it live.
 
 ---
 
+## Content management (admin CMS)
+
+Sign in at `/admin`. The same single password protects every admin page.
+
+| Page | What it edits |
+| --- | --- |
+| `/admin` | Overview, counts, quick actions and recent changes |
+| `/admin/status` | Configuration checks and every remaining TODO placeholder |
+| `/admin/content/products` | Product cards, slugs, links and platforms |
+| `/admin/content/portfolio` | Case studies and their images |
+| `/admin/content/company` | Contact details, mission, vision and map embed |
+| `/admin/content/social` | Social links (blank URL hides the icon) |
+| `/admin/content/tso` | TSO page content and package price |
+| `/admin/content/services` | Service cards and detail pages |
+| `/admin/content/homepage` | Hero, section headings and stat labels |
+| `/admin/content/values`, `/process_steps`, `/tech` | Other homepage sections |
+| `/admin/content/seo` | Default title, description, keywords and sharing image |
+| `/admin/media` | Reuse or delete uploaded images |
+| `/admin/messages` | Contact enquiries: filter, mark read/unread, reply, delete |
+| `/admin/backup` | Export/import JSON content and review change history |
+
+Each editor has add/remove/reorder controls and an **Edit as JSON** mode for advanced changes. Saving validates the whole section, writes one JSONB row to `site_content`, invalidates the cached reads, and regenerates affected public pages. **Reset section to defaults** deletes the override so the values in `lib/site.ts` apply again.
+
+Images are uploaded directly to Vercel Blob under `images/` and recorded in `media_assets`. They are safe to use in portfolio, product, SEO and other image fields; the public image domains and CSP are already configured.
+
+JSON backups contain text content only. APK files and uploaded images must be managed from **App downloads** and **Media library**. Before importing, the server validates every recognised section; a bad section aborts the import without writing anything.
+
+---
+
 ## SEO
 
-- `app/sitemap.ts` generates `/sitemap.xml` from the static pages and services.
+- `app/sitemap.ts` generates `/sitemap.xml` from the static pages and the current services in the CMS.
 - `app/robots.ts` generates `/robots.txt` and points to the sitemap.
 - Every page has a unique title and description, canonical URL, Open Graph and Twitter metadata, and `hreflang`.
 - Home and contact include Organization / LocalBusiness JSON-LD. Empty company fields are omitted rather than fabricated.
@@ -227,7 +282,7 @@ Set `NEXT_PUBLIC_SITE_URL` before generating the sitemap so absolute URLs are co
 
 ## Testing
 
-Vitest unit tests cover contact validation, the site helpers and the rate limiter.
+Vitest unit tests cover contact validation, site helpers, content schemas, Blob URL validation, admin authentication and the rate limiter.
 
 ```bash
 npm run typecheck
@@ -246,17 +301,20 @@ npm run build
 1. Import the repository into Vercel and set the framework preset to **Next.js**.
 2. Add the environment variables from `.env.example` in **Project → Settings → Environment Variables**.
 3. Set `NEXT_PUBLIC_SITE_URL` to the production origin: `https://teto.co.ke`. Vercel issues and renews TLS automatically; DNS is managed in Cloudflare (DNS only).
-4. Run `npm run db:migrate` once against the production `DATABASE_URL`.
-5. Deploy. Pages are prerendered at build time, so redeploy after changing any `TETO_*` variable.
+4. Run `npm run db:migrate` once against the production `DATABASE_URL`. It creates every table, including the CMS tables.
+5. Deploy. Pages are prerendered at build time, so redeploy after changing a `TETO_*` seed variable that has not been overridden in the admin. Content edited in `/admin` is live immediately.
 
 ### Deployment checklist
 
 - [ ] Hosting is **Vercel**; production origin is `https://teto.co.ke` (TLS is issued and renewed automatically by Vercel).
 - [ ] DNS is managed in **Cloudflare (DNS only)**; point the domain's records at Vercel as shown in the Vercel dashboard.
 - [ ] TLS is handled by Vercel; confirm `https://teto.co.ke` loads and HTTP redirects to HTTPS. Set `NEXT_PUBLIC_SITE_URL=https://teto.co.ke`.
-- [ ] Set `DATABASE_URL` and run `npm run db:migrate`; confirm the `contact_messages` table exists.
+- [ ] Set `DATABASE_URL` and run `npm run db:migrate`; confirm `contact_messages`, `app_downloads`, `site_content`, `content_changes` and `media_assets` exist.
 - [ ] Set `RESEND_API_KEY`, `CONTACT_TO_EMAIL` and a verified `CONTACT_FROM_EMAIL`, then send a test enquiry end-to-end.
-- [ ] Fill in all required `TETO_*` company details; the remaining social URLs (apart from TikTok) are intentionally blank for now.
+- [ ] Set `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET` and connect the Blob store; sign in at `/admin`.
+- [ ] Use `/admin/status` until no TODO placeholders remain, then fill them in the relevant editors.
+- [ ] Export a JSON backup from `/admin/backup` and store it safely.
+- [ ] Fill in all required `TETO_*` seed details; admin overrides take priority and need no redeploy.
 - [ ] Confirm the case-study copy and replace the delivery statements with verified results.
 - [ ] Confirm the security headers in `next.config.ts` match the production domain (and the CSP once Turnstile/Maps are configured).
 - [ ] Configure database backups, and test a restore.
@@ -269,7 +327,7 @@ npm run build
 
 ## TODO(owner)
 
-Every item below must be supplied or approved by the site owner. Search the codebase for `TODO(owner)` to find the visible placeholders.
+Every item below must be supplied or approved by the site owner. Search the codebase for `TODO(owner)` to find the visible placeholders, or use `/admin/status` for the current, live list. Values can be filled in through the admin editors without editing this file.
 
 ### Brand and content
 
@@ -341,20 +399,29 @@ app/
   not-found.tsx           Custom 404
   sitemap.ts              Generated /sitemap.xml
   robots.ts               Generated /robots.txt
+  admin/                  Admin overview, readiness, content editors, media, inbox, backup
+  api/admin/              Auth, Blob tokens, content, media, messages and downloads APIs
   api/contact/route.ts    Contact form endpoint
+  download/[slug]/        Public APK redirect
   globals.css             Design tokens, dark mode, component classes
-components/               Nav, footer, cards, forms, icons, JSON-LD
+components/               Nav, footer, cards, forms, admin editors, icons, JSON-LD
 lib/
-  site.ts                 Company details, services, portfolio, SEO defaults
+  site.ts                 Built-in defaults for all editable sections
+  content.ts              Validation, cached reads, saves, history, export/import
+  content-sections.ts     Section keys and labels shared with client components
+  admin-fields.ts         Declarative admin form definitions
+  admin-data.ts           Media and message-inbox database helpers
+  admin-auth.ts           Signed admin session cookie
   contact.ts              Contact form validation
   contact-mail.ts         Resend notification + auto-reply
   db.ts                   Neon Postgres client and insert
+  downloads.ts            APK validation and metadata helpers
   turnstile.ts            Cloudflare Turnstile verification
   rate-limit.ts           In-memory limiter plus a database-backed contact limit
   metadata.ts             Per-page metadata helper
-scripts/migrate.mjs       Creates the contact_messages table
+scripts/migrate.mjs       Creates every database table used by the site
 docs/deployment.md        Deployment runbook
-next.config.ts            Security headers and Turbopack root
+next.config.ts            Image domains, security headers and Turbopack root
 tests/                    Vitest unit tests
 vitest.config.mts         Vitest configuration
 public/                   Favicons, images
@@ -368,5 +435,5 @@ npm run build        # production build
 npm run start        # run the production build
 npm run typecheck    # tsc --noEmit
 npm run test         # vitest
-npm run db:migrate   # create/update the contact_messages table
+npm run db:migrate   # create/update all database tables
 ```

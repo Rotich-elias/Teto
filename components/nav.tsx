@@ -2,9 +2,12 @@ import Link from 'next/link';
 import { Icon } from '@/components/icon';
 import { Logo } from '@/components/logo';
 import { DesktopNavLinks, MobileMenu } from '@/components/nav-links';
-import { company, telHref } from '@/lib/site';
+import { getCompany } from '@/lib/content';
+import { telHref } from '@/lib/site';
 
-export function Nav() {
+export async function Nav() {
+  const company = await getCompany();
+
   return (
     <header className="sticky top-0 z-50 border-b border-line/80 bg-surface/90 backdrop-blur-md">
       <div className="container-page flex h-[4.5rem] items-center justify-between gap-4">

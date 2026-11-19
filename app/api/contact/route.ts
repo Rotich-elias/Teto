@@ -3,7 +3,7 @@ import { validateContact, type ContactFields } from '@/lib/contact';
 import { sendContactEmails } from '@/lib/contact-mail';
 import { databaseConfigured, saveContactMessage } from '@/lib/db';
 import { contactRateLimit } from '@/lib/rate-limit';
-import { findService } from '@/lib/site';
+import { getCompany, getServices } from '@/lib/content';
 import { verifyTurnstile } from '@/lib/turnstile';
 
 /** Outcome shown to no-JavaScript users as `/contact?status=<outcome>`. */
@@ -76,7 +76,8 @@ export async function POST(request: Request) {
     return respond('rate', 'Too many messages from this connection. Please wait an hour or email us directly.', 429);
   }
 
-  const result = validateContact(fields);
+  const [company, services] = await Promise.all([getCompany(), getServices()]);
+  const result = validateContact(fields, services);
   if (result.errors) {
     return respond('invalid', 'Please check the highlighted fields and try again.', 422, result.errors);
   }
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
     });
   }
 
-  const serviceName = findService(result.data.service)?.name ?? result.data.service;
+  const serviceName = services.find((item) => item.slug === result.data.service)?.name ?? result.data.service;
 
   // Store the enquiry first so a mail outage cannot lose it.
   try {
@@ -105,7 +106,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    await sendContactEmails(result.data, serviceName);
+    await sendContactEmails(result.data, serviceName, company);
   } catch (error) {
     // The enquiry passed validation; a mail outage must not show as a failure.
     console.error('Contact notification failed.', error);

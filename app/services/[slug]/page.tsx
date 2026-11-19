@@ -7,23 +7,27 @@ import { Icon } from '@/components/icon';
 import { SectionHeading } from '@/components/section-heading';
 import { ServiceCard } from '@/components/service-card';
 import { OrTodo } from '@/components/todo';
+import { findService, getCompany, getServices } from '@/lib/content';
 import { pageMetadata } from '@/lib/metadata';
-import { company, findService, services } from '@/lib/site';
+import { services as defaultServices } from '@/lib/site';
 
-export const dynamicParams = false;
-
+// Default services are prerendered; services added in the admin render on demand.
 export function generateStaticParams() {
-  return services.map((service) => ({ slug: service.slug }));
+  return defaultServices.map((service) => ({ slug: service.slug }));
 }
 
 export async function generateMetadata({ params }: PageProps<'/services/[slug]'>): Promise<Metadata> {
-  const service = findService((await params).slug);
+  const service = await findService((await params).slug);
   if (!service) return {};
   return pageMetadata({ title: service.metaTitle, description: service.metaDescription, path: `/services/${service.slug}` });
 }
 
 export default async function ServicePage({ params }: PageProps<'/services/[slug]'>) {
-  const service = findService((await params).slug);
+  const [service, services, company] = await Promise.all([
+    findService((await params).slug),
+    getServices(),
+    getCompany(),
+  ]);
   if (!service) notFound();
 
   const related = services.filter((item) => item.slug !== service.slug).slice(0, 3);

@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { Todo } from '@/components/todo';
+import { getCompany } from '@/lib/content';
 import { pageMetadata } from '@/lib/metadata';
-import { company } from '@/lib/site';
 
 export const metadata = pageMetadata({
   title: 'Terms of Use | Teto Technologies',
@@ -10,7 +10,9 @@ export const metadata = pageMetadata({
   path: '/terms',
 });
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const company = await getCompany();
+
   return (
     <>
       <section className="border-b border-line/60">

@@ -78,6 +78,21 @@ export function isDownloadsBlobUrl(url: string, slug?: string): boolean {
   }
 }
 
+/** Recognise a public Blob URL for an admin-uploaded image. */
+export function isImagesBlobUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return (
+      parsed.protocol === 'https:' &&
+      PUBLIC_BLOB_HOST.test(parsed.hostname) &&
+      parsed.pathname.startsWith('/images/') &&
+      /\.(png|jpe?g|webp|gif)$/i.test(parsed.pathname)
+    );
+  } catch {
+    return false;
+  }
+}
+
 /** Blob's `download=1` query parameter makes browsers save the file. */
 export function withDownloadParam(url: string): string {
   const parsed = new URL(url);

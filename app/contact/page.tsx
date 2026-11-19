@@ -3,8 +3,9 @@ import { Icon } from '@/components/icon';
 import { PageHero } from '@/components/page-hero';
 import { Schema } from '@/components/schema';
 import { OrTodo, Todo } from '@/components/todo';
+import { getCompany, getServices, whatsappHref } from '@/lib/content';
 import { pageMetadata } from '@/lib/metadata';
-import { company, findService, services, telHref, whatsappHref } from '@/lib/site';
+import { telHref } from '@/lib/site';
 
 export const metadata = pageMetadata({
   title: 'Contact Teto Technologies | Get a Quote',
@@ -34,12 +35,13 @@ export default async function ContactPage({
   searchParams: Promise<{ service?: string | string[]; status?: string | string[] }>;
 }) {
   const params = await searchParams;
+  const [company, services] = await Promise.all([getCompany(), getServices()]);
   const requested = Array.isArray(params.service) ? params.service[0] : params.service;
-  const selectedService = requested && findService(requested) ? requested : '';
+  const selectedService = requested && services.some((item) => item.slug === requested) ? requested : '';
   const statusParam = Array.isArray(params.status) ? params.status[0] : params.status;
   const banner = statusParam ? statusBanners[statusParam] : undefined;
   const turnstileSiteKey = process.env.TURNSTILE_ENABLED === 'true' ? process.env.TURNSTILE_SITE_KEY : undefined;
-  const whatsapp = whatsappHref();
+  const whatsapp = await whatsappHref();
 
   return (
     <>

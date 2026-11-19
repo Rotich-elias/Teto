@@ -35,7 +35,10 @@ function str(value: unknown): string {
  * Laravel `ContactRequest`, returning a flat field -> message map so the
  * client can highlight the offending inputs.
  */
-export function validateContact(input: Partial<ContactFields>): ValidationResult {
+export function validateContact(
+  input: Partial<ContactFields>,
+  availableServices: { slug: string }[] = services,
+): ValidationResult {
   const name = str(input.name);
   const email = str(input.email);
   const phone = str(input.phone);
@@ -53,7 +56,7 @@ export function validateContact(input: Partial<ContactFields>): ValidationResult
   if (phone && !PHONE_RE.test(phone)) errors.phone = 'Please enter a valid phone number, for example +254 7XX XXX XXX.';
 
   if (!service) errors.service = 'Please choose the service you are interested in.';
-  else if (!services.some((item) => item.slug === service)) errors.service = 'Please choose one of the listed services.';
+  else if (!availableServices.some((item) => item.slug === service)) errors.service = 'Please choose one of the listed services.';
 
   if (!message) errors.message = 'Please tell us a little about your project.';
   else if (message.length < 10) errors.message = 'Please give us at least 10 characters so we can help.';

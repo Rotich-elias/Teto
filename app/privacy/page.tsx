@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { Breadcrumb } from '@/components/breadcrumb';
 import { OrTodo, Todo } from '@/components/todo';
+import { getCompany } from '@/lib/content';
 import { pageMetadata } from '@/lib/metadata';
-import { company } from '@/lib/site';
 
 export const metadata = pageMetadata({
   title: 'Privacy Policy | Teto Technologies',
@@ -22,7 +22,9 @@ const sections = [
   { id: 'contact', label: 'Contact' },
 ];
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const company = await getCompany();
+
   return (
     <>
       <section className="border-b border-line/60">
