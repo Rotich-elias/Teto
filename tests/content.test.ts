@@ -57,6 +57,17 @@ describe('site content schemas', () => {
     invalid.plan = null as never;
     expect(parseSection('tso', invalid).success).toBe(false);
   });
+
+  it('strips stray quotes from the map embed URL', () => {
+    const value = structuredClone(company);
+    value.mapEmbedUrl = '"https://www.google.com/maps?q=Westlands,+Nairobi&output=embed"';
+    const result = parseSection('company', value);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      const parsed = result.data as typeof company;
+      expect(parsed.mapEmbedUrl).toBe('https://www.google.com/maps?q=Westlands,+Nairobi&output=embed');
+    }
+  });
 });
 
 describe('admin editor documents', () => {

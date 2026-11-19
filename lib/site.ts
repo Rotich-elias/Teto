@@ -17,6 +17,17 @@ function env(key: string, fallback: string | null = null): string | null {
   return value ? value : fallback;
 }
 
+/**
+ * Remove stray quote characters around URLs pasted from `.env` lines or
+ * config files (e.g. `TETO_MAP_EMBED_URL="https://..."`). Quotes in an iframe
+ * src make the browser request a malformed URL and Maps shows an error.
+ */
+export function cleanExternalUrl(value: string | null): string | null {
+  if (!value) return null;
+  const cleaned = value.trim().replace(/^["'`]+|["'`]+$/g, '').trim();
+  return cleaned || null;
+}
+
 export type Service = {
   slug: string;
   name: string;
@@ -84,7 +95,7 @@ export const company = {
   hours: env('TETO_HOURS'),
   founded: env('TETO_FOUNDED', '2019'),
   founder: env('TETO_FOUNDER', 'Rotich Elias'),
-  mapEmbedUrl: env('TETO_MAP_EMBED_URL'),
+  mapEmbedUrl: cleanExternalUrl(env('TETO_MAP_EMBED_URL')),
 };
 
 export const social: { name: string; icon: IconName; url: string | null }[] = [

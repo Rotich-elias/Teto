@@ -16,6 +16,7 @@ import {
   tech as defaultTech,
   tso as defaultTso,
   values as defaultValues,
+  cleanExternalUrl,
   type ProcessStep,
   type Product,
   type Project,
@@ -77,7 +78,7 @@ const companySchema = z.object({
   hours: nullableText(200),
   founded: nullableText(20),
   founder: nullableText(120),
-  mapEmbedUrl: nullableText(2000),
+  mapEmbedUrl: nullableText(2000).transform((value) => cleanExternalUrl(value)),
 });
 
 const socialSchema = z.array(
