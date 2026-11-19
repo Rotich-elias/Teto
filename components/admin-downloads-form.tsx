@@ -2,7 +2,7 @@
 
 import { upload } from '@vercel/blob/client';
 import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Icon } from '@/components/icon';
 import { APK_MIME_TYPE, type AppDownload } from '@/lib/downloads';
 
@@ -46,13 +46,41 @@ export function AdminDownloadsForm({
   const [status, setStatus] = useState<Status>('idle');
   const [message, setMessage] = useState('');
   const [progress, setProgress] = useState(0);
+  const [elapsed, setElapsed] = useState(0);
   const [removing, setRemoving] = useState<string | null>(null);
+  const uploadAbort = useRef<AbortController | null>(null);
+  const uploadCancelled = useRef(false);
+  const uploadStartedAt = useRef(0);
+
+  // Count up while a transfer is in progress so the user can see it is alive.
+  useEffect(() => {
+    if (status !== 'uploading' && status !== 'saving') return;
+    const timer = window.setInterval(
+      () => setElapsed(Math.floor((Date.now() - uploadStartedAt.current) / 1000)),
+      1000,
+    );
+    return () => window.clearInterval(timer);
+  }, [status]);
+
+  function formatElapsed(seconds: number): string {
+    const minutes = Math.floor(seconds / 60);
+    const rest = seconds % 60;
+    return minutes > 0 ? `${minutes}m ${rest}s` : `${rest}s`;
+  }
+
+  function cancelUpload() {
+    uploadCancelled.current = true;
+    uploadAbort.current?.abort();
+  }
 
   async function handleUpload(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus('idle');
     setMessage('');
     setProgress(0);
+    setElapsed(0);
+    uploadCancelled.current = false;
+    uploadStartedAt.current = Date.now();
 
     if (!slug) {
       setStatus('error');
@@ -84,12 +112,13 @@ export function AdminDownloadsForm({
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(-200);
 
       // A single PUT (rather than multipart) keeps onUploadProgress accurate.
-      // Guard against a hung transfer so the page never sits at 0% forever.
+      // A generous 30-minute safety net still allows large APKs on slow links.
       const uploadController = new AbortController();
+      uploadAbort.current = uploadController;
       const uploadTimer = window.setTimeout(() => {
         uploadTimedOut = true;
         uploadController.abort();
-      }, 5 * 60_000);
+      }, 30 * 60_000);
       let blob;
       try {
         blob = await upload(`downloads/${slug}/${safeName}`, file, {
@@ -144,18 +173,22 @@ export function AdminDownloadsForm({
       setMessage(`${file.name} is now the live download for this product.`);
       setFile(null);
       setVersion('');
+      uploadAbort.current = null;
       if (fileInput.current) fileInput.current.value = '';
       router.refresh();
     } catch (caught) {
       setStatus('error');
+      uploadAbort.current = null;
       if (saveTimedOut) {
         setMessage('Saving timed out. Check the database connection and try again.');
       } else if (uploadTimedOut) {
-        setMessage('The upload timed out. Check your connection and try again.');
-      } else if (caught instanceof DOMException && caught.name === 'AbortError') {
-        setMessage('The upload was cancelled. Try again.');
+        setMessage('The upload timed out after 30 minutes. Check your connection and try again.');
+      } else if (uploadCancelled.current) {
+        setMessage('Upload cancelled.');
+      } else if (caught instanceof Error) {
+        setMessage(caught.message);
       } else {
-        setMessage(caught instanceof Error ? caught.message : 'The upload failed.');
+        setMessage('The upload failed.');
       }
     }
   }
@@ -253,13 +286,20 @@ export function AdminDownloadsForm({
                 style={progress > 0 ? { width: `${progress}%` } : undefined}
               />
             </div>
-            <p className="field-hint">
-              {status === 'saving'
-                ? 'Upload complete — saving the download link…'
-                : progress > 0
-                  ? `Uploading… ${progress}%`
-                  : 'Uploading… large files can take a minute.'}
-            </p>
+            <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+              <p className="field-hint mb-0">
+                {status === 'saving'
+                  ? 'Upload complete — saving the download link…'
+                  : progress > 0
+                    ? `Uploading… ${progress}% · ${formatElapsed(elapsed)} elapsed`
+                    : `Uploading… ${formatElapsed(elapsed)} elapsed. Large files take a few minutes.`}
+              </p>
+              {status === 'uploading' && (
+                <button type="button" onClick={cancelUpload} className="btn-link text-xs">
+                  Cancel upload
+                </button>
+              )}
+            </div>
           </div>
         )}
 
