@@ -8,7 +8,7 @@ import { APK_MIME_TYPE, type AppDownload } from '@/lib/downloads';
 
 type ProductOption = { slug: string; name: string };
 
-type Status = 'idle' | 'uploading' | 'success' | 'error';
+type Status = 'idle' | 'uploading' | 'saving' | 'success' | 'error';
 
 function formatBytes(bytes: number): string {
   const value = Number(bytes);
@@ -75,31 +75,68 @@ export function AdminDownloadsForm({
       return;
     }
 
-    setStatus('uploading');
+    let phase: 'uploading' | 'saving' = 'uploading';
+    let uploadTimedOut = false;
+    let saveTimedOut = false;
+    setStatus(phase);
     try {
       // A safe pathname inside this product's folder in the Blob store.
       const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(-200);
-      const blob = await upload(`downloads/${slug}/${safeName}`, file, {
-        access: 'public',
-        handleUploadUrl: '/api/admin/blob-token',
-        clientPayload: JSON.stringify({ kind: 'apk', slug }),
-        contentType: APK_MIME_TYPE,
-        multipart: file.size > 5 * 1024 * 1024,
-        onUploadProgress: ({ percentage }) => setProgress(Math.round(percentage)),
-      });
 
-      const response = await fetch('/api/admin/downloads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          slug,
-          fileName: file.name,
-          version,
-          sizeBytes: file.size,
-          contentType: blob.contentType,
-          blobUrl: blob.url,
-        }),
-      });
+      // A single PUT (rather than multipart) keeps onUploadProgress accurate.
+      // Guard against a hung transfer so the page never sits at 0% forever.
+      const uploadController = new AbortController();
+      const uploadTimer = window.setTimeout(() => {
+        uploadTimedOut = true;
+        uploadController.abort();
+      }, 5 * 60_000);
+      let blob;
+      try {
+        blob = await upload(`downloads/${slug}/${safeName}`, file, {
+          access: 'public',
+          handleUploadUrl: '/api/admin/blob-token',
+          clientPayload: JSON.stringify({ kind: 'apk', slug }),
+          contentType: APK_MIME_TYPE,
+          abortSignal: uploadController.signal,
+          onUploadProgress: ({ percentage }) => {
+            if (Number.isFinite(percentage) && percentage > 0) {
+              setProgress(Math.min(100, Math.round(percentage)));
+            }
+          },
+        });
+      } finally {
+        window.clearTimeout(uploadTimer);
+      }
+
+      // The bytes are in Blob now. The remaining step is a small database write.
+      setProgress(100);
+      phase = 'saving';
+      setStatus(phase);
+
+      const saveController = new AbortController();
+      const saveTimer = window.setTimeout(() => {
+        saveTimedOut = true;
+        saveController.abort();
+      }, 60_000);
+      let response: Response;
+      try {
+        response = await fetch('/api/admin/downloads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slug,
+            fileName: file.name,
+            version,
+            sizeBytes: file.size,
+            contentType: blob.contentType,
+            blobUrl: blob.url,
+          }),
+          signal: saveController.signal,
+        });
+      } finally {
+        window.clearTimeout(saveTimer);
+      }
+
       const data = (await response.json()) as { error?: string };
       if (!response.ok) throw new Error(data.error ?? 'Could not save the upload.');
 
@@ -111,7 +148,15 @@ export function AdminDownloadsForm({
       router.refresh();
     } catch (caught) {
       setStatus('error');
-      setMessage(caught instanceof Error ? caught.message : 'The upload failed.');
+      if (saveTimedOut) {
+        setMessage('Saving timed out. Check the database connection and try again.');
+      } else if (uploadTimedOut) {
+        setMessage('The upload timed out. Check your connection and try again.');
+      } else if (caught instanceof DOMException && caught.name === 'AbortError') {
+        setMessage('The upload was cancelled. Try again.');
+      } else {
+        setMessage(caught instanceof Error ? caught.message : 'The upload failed.');
+      }
     }
   }
 
@@ -200,12 +245,21 @@ export function AdminDownloadsForm({
           />
         </div>
 
-        {status === 'uploading' && (
+        {(status === 'uploading' || status === 'saving') && (
           <div aria-live="polite">
             <div className="h-2 w-full overflow-hidden rounded-full bg-surface-sunken">
-              <div className="h-full bg-primary-600 transition-all" style={{ width: `${progress}%` }} />
+              <div
+                className={`h-full bg-primary-600 transition-all ${status === 'uploading' && progress === 0 ? 'progress-indeterminate' : ''}`}
+                style={progress > 0 ? { width: `${progress}%` } : undefined}
+              />
             </div>
-            <p className="field-hint">Uploading… {progress}%</p>
+            <p className="field-hint">
+              {status === 'saving'
+                ? 'Upload complete — saving the download link…'
+                : progress > 0
+                  ? `Uploading… ${progress}%`
+                  : 'Uploading… large files can take a minute.'}
+            </p>
           </div>
         )}
 
@@ -219,9 +273,9 @@ export function AdminDownloadsForm({
           </p>
         )}
 
-        <button type="submit" disabled={status === 'uploading' || !slug} className="btn-primary">
+        <button type="submit" disabled={status === 'uploading' || status === 'saving' || !slug} className="btn-primary">
           <Icon name="download" className="h-4 w-4" />
-          {status === 'uploading' ? 'Uploading…' : 'Upload APK'}
+          {status === 'uploading' ? 'Uploading…' : status === 'saving' ? 'Saving…' : 'Upload APK'}
         </button>
       </form>
 

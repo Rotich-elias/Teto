@@ -2,7 +2,6 @@ import type { NextConfig } from 'next';
 
 const isProd = process.env.NODE_ENV === 'production';
 const turnstile = process.env.TURNSTILE_ENABLED === 'true';
-const hasMapEmbed = Boolean(process.env.TETO_MAP_EMBED_URL);
 
 /**
  * Content Security Policy. Next.js emits inline bootstrap scripts and inline
@@ -19,7 +18,9 @@ function contentSecurityPolicy(): string {
     'https://*.public.blob.vercel-storage.com',
     'https://*.private.blob.vercel-storage.com',
   ];
-  const frames: string[] = [];
+  // Google Maps is allowed unconditionally: the embed URL is editable in the
+  // admin at runtime, so the CSP cannot depend on a build-time env variable.
+  const frames: string[] = ['https://www.google.com', 'https://maps.google.com'];
   // Admin-uploaded images are served directly from Vercel Blob.
   const blobImages = 'https://*.public.blob.vercel-storage.com';
 
@@ -32,10 +33,6 @@ function contentSecurityPolicy(): string {
     scripts.push('https://challenges.cloudflare.com');
     connects.push('https://challenges.cloudflare.com');
     frames.push('https://challenges.cloudflare.com');
-  }
-
-  if (hasMapEmbed) {
-    frames.push('https://www.google.com', 'https://maps.google.com');
   }
 
   const directives = [

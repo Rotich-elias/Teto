@@ -230,6 +230,20 @@
    Motion
    -------------------------------------------------------------------------- */
 
+@keyframes progress-indeterminate {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(400%);
+    }
+}
+
+.progress-indeterminate {
+    animation: progress-indeterminate 1.4s ease-in-out infinite;
+    width: 25%;
+}
+
 @keyframes fade-up {
     from {
         opacity: 0;
@@ -318,6 +332,7 @@
 
     .animate-fade-up,
     .animate-fade-up-delay,
+    .progress-indeterminate,
     .animate-grid-drift,
     .animate-drift-a,
     .animate-drift-b,

@@ -284,8 +284,10 @@ TURNSTILE_ENABLED, TURNSTILE_SITE_KEY, TURNSTILE_SECRET_KEY
 ```
 
 > `TETO_MAP_EMBED_URL` is the **embed** URL from Google Maps
-> (**Share → Embed a map → Copy HTML**, then take the `src` value). Setting it
-> also adds the Google Maps origins to the CSP automatically.
+> (**Share → Embed a map → Copy HTML**, then take the `src` value). It is only a
+> seed default — the live value is set in **Admin → Contact details**. Google
+> Maps frame sources are always allowed by the CSP, so changing the map link in
+> the admin does not need a redeploy.
 
 ### 4.3 First deploy
 
@@ -403,9 +405,10 @@ a database change.
 | `db:migrate` says `DATABASE_URL is not set` | The variable was not passed. Use `DATABASE_URL="…" npm run db:migrate`. |
 | 429 from the contact endpoint | Rate limit hit (5/hour/IP). The database-backed count shares this across instances. |
 | Turnstile widget missing | `TURNSTILE_ENABLED=true` and `TURNSTILE_SITE_KEY` must both be set, then redeploy. |
-| Map shows a placeholder | `TETO_MAP_EMBED_URL` is blank; set it and redeploy. |
+| Map shows a placeholder | The map embed URL is blank. Add it in **Admin → Contact details**; `TETO_MAP_EMBED_URL` is only the seed default. |
 | Company details not updating | Admin-saved values take priority. If no override exists, `TETO_*` values are baked in at build time — redeploy after changing them. |
-| CSP blocks Turnstile or Maps | Ensure the feature is enabled (`TURNSTILE_ENABLED=true` / `TETO_MAP_EMBED_URL` set) and redeploy so `next.config.ts` includes the origins. |
+| CSP blocks Turnstile | Set `TURNSTILE_ENABLED=true` and `TURNSTILE_SITE_KEY`, then redeploy so `next.config.ts` includes the Cloudflare origins. |
+| Map iframe says “Refused to connect” | Confirm the URL in **Admin → Contact details** is a Google Maps `.../maps?...&output=embed` or `.../maps/embed?...` URL. Google Maps frames are always allowed by the CSP; redeploy once if the site was built from an older `next.config.ts`. |
 | Admin login says "not configured" | Set `ADMIN_PASSWORD` and `ADMIN_SESSION_SECRET` in Vercel, then redeploy. |
 | Upload fails with a CSP error | Redeploy after connecting the Blob store — `next.config.ts` allows the Blob origins in `connect-src`. |
 | Upload is rejected as "unexpected upload location" | The Blob store must be public and the file must land under `downloads/<slug>/`. Re-upload from `/admin/downloads`. |

@@ -98,7 +98,7 @@ Without `DATABASE_URL` or `RESEND_API_KEY` the contact form still validates and 
 | `TETO_LEGAL_NAME` | Footer and legal pages |
 | `TETO_REG_NUMBER` | Footer and legal pages |
 | `TETO_FOUNDER` | About page |
-| `TETO_MAP_EMBED_URL` | Contact page map iframe |
+| `TETO_MAP_EMBED_URL` | Seed default for the contact page map iframe; admin **Contact details** overrides it |
 | `TETO_LINKEDIN`, `TETO_GITHUB`, `TETO_X`, `TETO_FACEBOOK`, `TETO_INSTAGRAM`, `TETO_TIKTOK` | Footer social links |
 
 Blank values render a visible `TODO(owner)` badge instead of inventing information; blank social URLs simply hide the social icons. These variables are build-time seed defaults: redeploy after changing one that has not been overridden in the admin. Admin-edited values take priority and need no redeploy.
@@ -274,7 +274,7 @@ Set `NEXT_PUBLIC_SITE_URL` before generating the sitemap so absolute URLs are co
 - Secrets are read from environment variables; `.env*` files are git-ignored.
 - Honeypot, rate limiting and optional Turnstile on the contact form.
 - Security headers are set for every route in `next.config.ts`: `Content-Security-Policy`, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, `Cross-Origin-Opener-Policy`, `X-Permitted-Cross-Domain-Policies`, and (in production) `Strict-Transport-Security`.
-- The CSP only allows the Cloudflare Turnstile and Google Maps sources when those features are configured, and adds `'unsafe-eval'`/websocket sources in development only.
+- The CSP always allows Google Maps frames because the embed URL can be changed in the admin at runtime. Cloudflare Turnstile sources are added only when it is enabled, and development adds `'unsafe-eval'`/websocket sources.
 
 > **Note on CSP:** Next.js emits inline bootstrap scripts, so the policy allows `'unsafe-inline'` for `script-src`/`style-src` while pages stay statically rendered. A stricter nonce-based policy (as the Laravel app used) is possible with `middleware.ts`, but it opts every page into dynamic rendering. Revisit if a stricter policy is required.
 
