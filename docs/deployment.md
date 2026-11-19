@@ -410,6 +410,7 @@ a database change.
 | CSP blocks Turnstile | Set `TURNSTILE_ENABLED=true` and `TURNSTILE_SITE_KEY`, then redeploy so `next.config.ts` includes the Cloudflare origins. |
 | Map iframe says “Refused to connect” | Confirm the URL in **Admin → Contact details** is a Google Maps `.../maps?...&output=embed` or `.../maps/embed?...` URL. Google Maps frames are always allowed by the CSP; redeploy once if the site was built from an older `next.config.ts`. |
 | Admin login says "not configured" | Set `ADMIN_PASSWORD` and `ADMIN_SESSION_SECRET` in Vercel, then redeploy. |
+| Upload fails with "Failed to fetch" (or hangs for ~30 minutes) | The `@vercel/blob` client posts to `https://vercel.com/api/blob`, so `next.config.ts` must include `https://vercel.com` in `connect-src`. Redeploy after changing the CSP. |
 | Upload fails with a CSP error | Redeploy after connecting the Blob store — `next.config.ts` allows the Blob origins in `connect-src`. |
 | Upload is rejected as "unexpected upload location" | The Blob store must be public and the file must land under `downloads/<slug>/`. Re-upload from `/admin/downloads`. |
 | `/download/<slug>` redirects to `/products` | No active row in `app_downloads`. Run `npm run db:migrate` and upload the APK from the admin page. |

@@ -14,6 +14,9 @@ function contentSecurityPolicy(): string {
   const connects = [
     "'self'",
     // The admin page uploads APKs directly from the browser to Vercel Blob.
+    // @vercel/blob v2.9 client uploads go through https://vercel.com/api/blob,
+    // so that origin must be allowed or the request is blocked before it starts.
+    'https://vercel.com',
     'https://blob.vercel-storage.com',
     'https://*.public.blob.vercel-storage.com',
     'https://*.private.blob.vercel-storage.com',
@@ -69,6 +72,9 @@ if (isProd) {
 }
 
 const nextConfig: NextConfig = {
+  // Cap @vercel/blob's default 10 network retries so a real failure is shown
+  // in seconds instead of the SDK silently retrying for ~17 minutes.
+  env: { VERCEL_BLOB_RETRIES: '3' },
   images: {
     remotePatterns: [
       {
