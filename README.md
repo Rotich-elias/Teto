@@ -251,7 +251,7 @@ Sign in at `/admin/adverts` to publish the popup shown when an app launches.
 3. Save to publish. Adverts can be edited, paused or deleted from the list; pausing keeps the record so it can be reactivated later.
 4. The app reads `GET /api/adverts?app=<slug>`, which returns active, in-window adverts as `{ "adverts": [...] }` (newest first, capped at 10). Each install shows an advert once and remembers its ID locally.
 
-Admin routes (`/api/admin/adverts`) require the signed session cookie. Image URLs must point at the `images/` folder of this site's Blob store and button links must use https. The public feed is cached for 60 seconds and allows cross-origin reads so a Flutter web build can use it too.
+Admin routes (`/api/admin/adverts`) require the signed session cookie. Image URLs must point at the `images/` folder of this site's Blob store and button links must use https. The public feed is not cached, so a newly published advert appears on the next app launch; it allows cross-origin reads so a Flutter web build can use it too.
 
 ---
 

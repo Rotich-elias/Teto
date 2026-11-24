@@ -4,8 +4,10 @@ import { isValidProductSlug } from '@/lib/downloads';
 
 export const dynamic = 'force-dynamic';
 
+// Adverts are admin-managed and must appear on the next launch. Never let a
+// CDN serve an older empty feed after an advert is published.
 const responseHeaders = {
-  'Cache-Control': 'public, max-age=60, stale-while-revalidate=300',
+  'Cache-Control': 'no-store',
   'Access-Control-Allow-Origin': '*',
 };
 
