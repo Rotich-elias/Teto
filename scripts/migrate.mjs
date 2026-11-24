@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Creates all tables used by the contact form, downloads and admin CMS.
+ * Creates all tables used by the contact form, downloads, adverts and admin CMS.
  * Safe to run repeatedly.
  *
  *   npm run db:migrate
@@ -61,6 +61,29 @@ const statements = [
       blob_pathname TEXT NOT NULL,
       uploaded_at TIMESTAMPTZ NOT NULL DEFAULT now()
     )`,
+  },
+  {
+    name: 'create app_adverts table',
+    query: `CREATE TABLE IF NOT EXISTS app_adverts (
+      id BIGSERIAL PRIMARY KEY,
+      app_slug TEXT NOT NULL,
+      title TEXT NOT NULL,
+      body TEXT NOT NULL,
+      image_url TEXT,
+      cta_label TEXT,
+      cta_url TEXT,
+      starts_at TIMESTAMPTZ,
+      ends_at TIMESTAMPTZ,
+      active BOOLEAN NOT NULL DEFAULT true,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+      CONSTRAINT app_adverts_window CHECK (ends_at IS NULL OR starts_at IS NULL OR ends_at >= starts_at)
+    )`,
+  },
+  {
+    name: 'index app_adverts for active app lookups',
+    query: `CREATE INDEX IF NOT EXISTS app_adverts_app_active_created_idx
+      ON app_adverts (app_slug, active, created_at DESC)`,
   },
   {
     name: 'add read flag to contact_messages',

@@ -184,6 +184,21 @@ app_downloads (
   uploaded_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 )
 
+app_adverts (
+  id            BIGSERIAL PRIMARY KEY,
+  app_slug      TEXT NOT NULL,
+  title         TEXT NOT NULL,
+  body          TEXT NOT NULL,
+  image_url     TEXT,
+  cta_label     TEXT,
+  cta_url       TEXT,
+  starts_at     TIMESTAMPTZ,
+  ends_at       TIMESTAMPTZ,
+  active        BOOLEAN NOT NULL DEFAULT true,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+)
+
 site_content (
   key         TEXT PRIMARY KEY,
   data        JSONB NOT NULL,
@@ -224,6 +239,19 @@ The migration is idempotent and safe to run repeatedly.
 Products and their slugs are managed in **Admin → Products**. To add another downloadable app, give it a `slug` and set its download URL to `/download/<slug>`; it will then appear in the APK upload dropdown. Admin pages are `noindex` and never prerendered.
 
 Upload endpoints require a signed, httpOnly session cookie, only accept the Android package MIME type, cap the size, and verify that the stored URL belongs to the `downloads/` folder of your Blob store before making it live.
+
+---
+
+## App adverts
+
+Sign in at `/admin/adverts` to publish the popup shown when an app launches.
+
+1. Choose the target app (its product slug), add a title and message, and optionally upload a banner image through the media library.
+2. Add an optional button label and destination URL, plus start/end dates to schedule the advert. Leave both dates empty to make it live immediately and indefinitely.
+3. Save to publish. Adverts can be edited, paused or deleted from the list; pausing keeps the record so it can be reactivated later.
+4. The app reads `GET /api/adverts?app=<slug>`, which returns active, in-window adverts as `{ "adverts": [...] }` (newest first, capped at 10). Each install shows an advert once and remembers its ID locally.
+
+Admin routes (`/api/admin/adverts`) require the signed session cookie. Image URLs must point at the `images/` folder of this site's Blob store and button links must use https. The public feed is cached for 60 seconds and allows cross-origin reads so a Flutter web build can use it too.
 
 ---
 
@@ -309,7 +337,7 @@ npm run build
 - [ ] Hosting is **Vercel**; production origin is `https://teto.co.ke` (TLS is issued and renewed automatically by Vercel).
 - [ ] DNS is managed in **Cloudflare (DNS only)**; point the domain's records at Vercel as shown in the Vercel dashboard.
 - [ ] TLS is handled by Vercel; confirm `https://teto.co.ke` loads and HTTP redirects to HTTPS. Set `NEXT_PUBLIC_SITE_URL=https://teto.co.ke`.
-- [ ] Set `DATABASE_URL` and run `npm run db:migrate`; confirm `contact_messages`, `app_downloads`, `site_content`, `content_changes` and `media_assets` exist.
+- [ ] Set `DATABASE_URL` and run `npm run db:migrate`; confirm `contact_messages`, `app_downloads`, `app_adverts`, `site_content`, `content_changes` and `media_assets` exist.
 - [ ] Set `RESEND_API_KEY`, `CONTACT_TO_EMAIL` and a verified `CONTACT_FROM_EMAIL`, then send a test enquiry end-to-end.
 - [ ] Set `ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET` and connect the Blob store; sign in at `/admin`.
 - [ ] Use `/admin/status` until no TODO placeholders remain, then fill them in the relevant editors.

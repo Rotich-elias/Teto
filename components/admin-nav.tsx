@@ -12,6 +12,7 @@ const links = [
   { href: '/admin/content/social', label: 'Social links' },
   { href: '/admin/content/tso', label: 'TSO & price' },
   { href: '/admin/downloads', label: 'App downloads' },
+  { href: '/admin/adverts', label: 'App adverts' },
   { href: '/admin/media', label: 'Media library' },
   { href: '/admin/messages', label: 'Message inbox' },
   { href: '/admin/backup', label: 'Backup & history' },
